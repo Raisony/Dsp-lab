@@ -1,0 +1,10 @@
+cv2
+math
+wave
+scipy
+struct
+librosa
+numpy
+tkinter
+pyaudio
+matplotlib
