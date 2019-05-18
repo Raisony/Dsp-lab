@@ -1,0 +1,375 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>PCA of multichannel ECG data</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-04-20"><meta name="DC.source" content="pca_ECG.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>PCA of multichannel ECG data</h1><!--introduction--><p>This program illustrates the use of PCA on compressing multichannel ECG data.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Load data</a></li><li><a href="#2">Center the data (remove mean from each component)</a></li><li><a href="#3">Compute PCA matrix</a></li><li><a href="#4">Find components</a></li><li><a href="#5">About the eigenvalues...</a></li><li><a href="#6">Approximate all 15 ECG signals using first 3 principle components</a></li><li><a href="#7">Approximate all 15 ECG signals using first 7 principle components</a></li></ul></div><h2>Load data<a name="1"></a></h2><pre class="codeinput">clear
+load <span class="string">multichannel_data_1</span>
+whos
+
+print_figs_to_file = 0;   <span class="comment">% set to 1 or 0</span>
+</pre><pre class="codeoutput">  Name       Size               Bytes  Class     Attributes
+
+  X         15x3000            360000  double              
+  t          1x3000             24000  double              
+
+</pre><h2>Center the data (remove mean from each component)<a name="2"></a></h2><pre class="codeinput"><span class="keyword">for</span> k = 1:15
+    X(k,:) = X(k,:) - mean(X(k,:));
+<span class="keyword">end</span>
+
+<span class="comment">% display data</span>
+clf
+suptitle(<span class="string">'15 ECG CHANNELS'</span>)
+<span class="keyword">for</span> k = 1:15
+    subplot(8,2,k)
+    plot(t,X(k,:))
+    axis <span class="string">tight</span>
+    axis <span class="string">off</span>
+<span class="keyword">end</span>
+<span class="keyword">if</span> print_figs_to_file
+    orient <span class="string">landscape</span>, print <span class="string">-dpsc</span> <span class="string">pca_ECG_figures</span>
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="pca_ECG_01.png" alt=""> <h2>Compute PCA matrix<a name="3"></a></h2><pre class="codeinput">A = X * X';     <span class="comment">% data covariance matrix - 15 x 15 matrix</span>
+
+<span class="comment">% compute eigenvectors and eigenvalues</span>
+[E,D] = eig(A);
+
+<span class="comment">% check that A = E D E'</span>
+err = A - E * D * E';
+max(abs(err(:)));
+
+<span class="comment">% eigevalues in descending order</span>
+d = diag(D);
+[tmp, k] = sort(-d);
+
+<span class="comment">% resort</span>
+d = d(k)
+D = diag(d);
+E = E(:,k);
+
+<span class="comment">% check that A = E D E'</span>
+err = A - E * D * E';
+max(abs(err(:)));
+
+<span class="comment">% Set P matrix</span>
+P = E';
+
+clf
+stem(d,<span class="string">'.'</span>)
+title(<span class="string">'EIGENVALUES'</span>)
+xlabel(<span class="string">'INDEX'</span>)
+<span class="keyword">if</span> print_figs_to_file
+    orient <span class="string">landscape</span>, print <span class="string">-append</span> <span class="string">-dpsc</span> <span class="string">pca_ECG_figures</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">d =
+  618.8435
+  333.2342
+  263.3232
+   20.2965
+    5.9766
+    2.9413
+    1.2109
+    0.8717
+    0.3849
+    0.2981
+    0.1544
+    0.0005
+    0.0004
+    0.0004
+    0.0004
+</pre><img vspace="5" hspace="5" src="pca_ECG_02.png" alt=""> <h2>Find components<a name="4"></a></h2><p>The components are found using P*X. The eigenvalue of each component is displayed by the plot.</p><pre class="codeinput"><span class="comment">% compute the components of the data</span>
+Y = P * X;
+
+<span class="comment">% display component signals</span>
+clf
+suptitle(<span class="string">'15 COMPONENTS FOUND USING PCA'</span>)
+<span class="keyword">for</span> k = 1:15
+    subplot(8,2,k)
+    plot(t,Y(k,:))
+        th = text(t(1)-0.1,0,sprintf(<span class="string">'%9.4f'</span>,d(k)));
+        set(th,<span class="string">'units'</span>,<span class="string">'normalized'</span>);
+        set(th,<span class="string">'HorizontalAlignment'</span>,<span class="string">'right'</span>);
+    axis <span class="string">tight</span>
+    axis <span class="string">off</span>
+<span class="keyword">end</span>
+<span class="keyword">if</span> print_figs_to_file
+    orient <span class="string">landscape</span>, print <span class="string">-append</span> <span class="string">-dpsc</span> <span class="string">pca_ECG_figures</span>
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="pca_ECG_03.png" alt=""> <h2>About the eigenvalues...<a name="5"></a></h2><p>Note that the eigenvalues are exactly equal to the sum of square of each component.</p><pre class="codeinput">S = zeros(15,1);
+<span class="keyword">for</span> k = 1:15
+    S(k) = sum(Y(k,:).^2);
+<span class="keyword">end</span>
+S
+
+<span class="comment">% The values computed here from the principle components</span>
+<span class="comment">% are exactly the eigenvalue we found earlier.</span>
+<span class="comment">% You can therefore see that some of the components are very small</span>
+<span class="comment">% in amplitude.</span>
+</pre><pre class="codeoutput">S =
+  618.8435
+  333.2342
+  263.3232
+   20.2965
+    5.9766
+    2.9413
+    1.2109
+    0.8717
+    0.3849
+    0.2981
+    0.1544
+    0.0005
+    0.0004
+    0.0004
+    0.0004
+</pre><h2>Approximate all 15 ECG signals using first 3 principle components<a name="6"></a></h2><p>If we reconstruct the 15 channels from only the first 3 components, then we obtain a a 15-channel data set that is close to the original 15-channel data set.</p><pre class="codeinput">Y2 = Y;
+Y2(4:15,:) = 0;
+X_approx = P'*Y2;
+
+<span class="comment">% display approximate reconstruction from first 3 principle components</span>
+clf
+suptitle(<span class="string">'15 ECG CHANNELS RECONSTRUCTED FROM TOP 3 PRINCIPAL COMPONENTS'</span>)
+<span class="keyword">for</span> k = 1:15
+    subplot(8,2,k)
+    plot(t,X_approx(k,:))
+    axis <span class="string">tight</span>
+    axis <span class="string">off</span>
+<span class="keyword">end</span>
+<span class="keyword">if</span> print_figs_to_file
+    orient <span class="string">landscape</span>, print <span class="string">-append</span> <span class="string">-dpsc</span> <span class="string">pca_ECG_figures</span>
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="pca_ECG_04.png" alt=""> <h2>Approximate all 15 ECG signals using first 7 principle components<a name="7"></a></h2><p>If we reconstruct the 15 channels from only the first 7 components, then we obtain a 15-channel data set that is almost indistinguishable from the original 15-channel data set. Practially all the information in the 15 channels can be represented using only 7 channels.</p><pre class="codeinput">Y2 = Y;
+Y2(8:15,:) = 0;
+X_approx = P'*Y2;
+
+<span class="comment">% display approximate reconstruction from first 7 principle components</span>
+clf
+suptitle(<span class="string">'15 ECG CHANNELS RECONSTRUCTED FROM TOP 7 PRINCIPAL COMPONENTS'</span>)
+<span class="keyword">for</span> k = 1:15
+    subplot(8,2,k)
+    plot(t,X_approx(k,:))
+    axis <span class="string">tight</span>
+    axis <span class="string">off</span>
+<span class="keyword">end</span>
+<span class="keyword">if</span> print_figs_to_file
+    orient <span class="string">landscape</span>, print <span class="string">-append</span> <span class="string">-dpsc</span> <span class="string">pca_ECG_figures</span>
+<span class="keyword">end</span>
+</pre><img vspace="5" hspace="5" src="pca_ECG_05.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% PCA of multichannel ECG data
+% This program illustrates the use of PCA
+% on compressing multichannel ECG data.
+
+%% Load data
+
+clear
+load multichannel_data_1
+whos
+
+print_figs_to_file = 0;   % set to 1 or 0
+
+%% Center the data (remove mean from each component)
+
+for k = 1:15
+    X(k,:) = X(k,:) - mean(X(k,:));
+end
+
+% display data
+clf
+suptitle('15 ECG CHANNELS')
+for k = 1:15
+    subplot(8,2,k)
+    plot(t,X(k,:))
+    axis tight
+    axis off
+end
+if print_figs_to_file
+    orient landscape, print -dpsc pca_ECG_figures
+end
+
+%% Compute PCA matrix
+
+A = X * X';     % data covariance matrix - 15 x 15 matrix
+
+% compute eigenvectors and eigenvalues
+[E,D] = eig(A);
+
+% check that A = E D E'
+err = A - E * D * E';
+max(abs(err(:)));
+
+% eigevalues in descending order
+d = diag(D);
+[tmp, k] = sort(-d);
+
+% resort
+d = d(k)
+D = diag(d);
+E = E(:,k);
+
+% check that A = E D E'
+err = A - E * D * E';
+max(abs(err(:)));
+
+% Set P matrix
+P = E';
+
+clf
+stem(d,'.')
+title('EIGENVALUES')
+xlabel('INDEX')
+if print_figs_to_file
+    orient landscape, print -append -dpsc pca_ECG_figures
+end
+
+%% Find components
+% The components are found using P*X.
+% The eigenvalue of each component is displayed by the plot.
+
+% compute the components of the data
+Y = P * X;
+
+% display component signals
+clf
+suptitle('15 COMPONENTS FOUND USING PCA')
+for k = 1:15
+    subplot(8,2,k)
+    plot(t,Y(k,:))
+        th = text(t(1)-0.1,0,sprintf('%9.4f',d(k)));
+        set(th,'units','normalized');
+        set(th,'HorizontalAlignment','right');
+    axis tight
+    axis off
+end
+if print_figs_to_file
+    orient landscape, print -append -dpsc pca_ECG_figures
+end
+
+%% About the eigenvalues...
+% Note that the eigenvalues are exactly equal to the
+% sum of square of each component.
+
+S = zeros(15,1);
+for k = 1:15
+    S(k) = sum(Y(k,:).^2);
+end
+S
+
+% The values computed here from the principle components
+% are exactly the eigenvalue we found earlier.
+% You can therefore see that some of the components are very small 
+% in amplitude.
+
+
+%% Approximate all 15 ECG signals using first 3 principle components
+% If we reconstruct the 15 channels from only the first 3 components,
+% then we obtain a a 15-channel data set that is close to
+% the original 15-channel data set.
+
+Y2 = Y;
+Y2(4:15,:) = 0;
+X_approx = P'*Y2;
+
+% display approximate reconstruction from first 3 principle components
+clf
+suptitle('15 ECG CHANNELS RECONSTRUCTED FROM TOP 3 PRINCIPAL COMPONENTS')
+for k = 1:15
+    subplot(8,2,k)
+    plot(t,X_approx(k,:))
+    axis tight
+    axis off
+end
+if print_figs_to_file
+    orient landscape, print -append -dpsc pca_ECG_figures
+end
+
+
+%% Approximate all 15 ECG signals using first 7 principle components
+% If we reconstruct the 15 channels from only the first 7 components,
+% then we obtain a 15-channel data set that is almost
+% indistinguishable from the original 15-channel data set.
+% Practially all the information in the 15 channels can be
+% represented using only 7 channels.
+
+Y2 = Y;
+Y2(8:15,:) = 0;
+X_approx = P'*Y2;
+
+% display approximate reconstruction from first 7 principle components
+clf
+suptitle('15 ECG CHANNELS RECONSTRUCTED FROM TOP 7 PRINCIPAL COMPONENTS')
+for k = 1:15
+    subplot(8,2,k)
+    plot(t,X_approx(k,:))
+    axis tight
+    axis off
+end
+if print_figs_to_file
+    orient landscape, print -append -dpsc pca_ECG_figures
+end
+
+
+##### SOURCE END #####
+--></body></html>

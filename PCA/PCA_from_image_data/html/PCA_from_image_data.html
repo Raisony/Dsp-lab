@@ -1,0 +1,256 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Transforms - PCA</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2016-04-18"><meta name="DC.source" content="PCA_from_image_data.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>Transforms - PCA</h1><!--introduction--><p>Find PCA for image data</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Start</a></li><li><a href="#2">Load image</a></li><li><a href="#3">Extract sequences of length 8</a></li><li><a href="#4">Compute and remove mean</a></li><li><a href="#5">Compute covariance matrix</a></li><li><a href="#7">Compute PCA</a></li><li><a href="#9">Display PCA basis vectors</a></li></ul></div><h2>Start<a name="1"></a></h2><pre class="codeinput">clear
+</pre><h2>Load image<a name="2"></a></h2><pre class="codeinput">a = imread(<span class="string">'IMG_2616.jpg'</span>);
+a = rgb2gray(a);
+a = double(a);
+
+figure(1)
+clf
+imagesc(a);
+colormap <span class="string">gray</span>
+axis <span class="string">image</span>
+</pre><img vspace="5" hspace="5" src="PCA_from_image_data_01.png" alt=""> <h2>Extract sequences of length 8<a name="3"></a></h2><pre class="codeinput"><span class="comment">% Ensure that the number of rows is a multiple of 8</span>
+[N1, N2] = size(a);
+M1 = 8*floor(N1/8);
+a = a(1:M1,:);
+
+<span class="comment">% convert to single one-dimensional array</span>
+x = a(:);
+
+<span class="comment">% reshape into array where each column is an 8-point sequence</span>
+x = reshape(x,8,M1*N2/8);
+
+size(x)
+</pre><pre class="codeoutput">
+ans =
+
+           8      240000
+
+</pre><h2>Compute and remove mean<a name="4"></a></h2><pre class="codeinput">m = mean(x,2);      <span class="comment">% average 8-point sequence</span>
+figure(2)
+clf
+plot(m)
+ylim([0 255])
+box <span class="string">off</span>
+title(<span class="string">'mean 8-point signal'</span>)   <span class="comment">% note: practically a constant!</span>
+
+<span class="comment">% Subtract 8-point mean signal from each 8-point signal</span>
+x2 = bsxfun(@minus, x, m);
+</pre><img vspace="5" hspace="5" src="PCA_from_image_data_02.png" alt=""> <h2>Compute covariance matrix<a name="5"></a></h2><pre class="codeinput">N = size(x2,2);
+R = (1/N) * x2 * (x2');
+
+size(R)
+</pre><pre class="codeoutput">
+ans =
+
+     8     8
+
+</pre><pre class="codeinput">figure(3)
+clf
+imagesc(R)
+colormap(gray)
+axis <span class="string">image</span>
+</pre><img vspace="5" hspace="5" src="PCA_from_image_data_03.png" alt=""> <h2>Compute PCA<a name="7"></a></h2><p>Perform eigen decomposition of covariance matrix. The orthonormal matrix of eigenvectors is the KLT</p><pre class="codeinput">[V, D] = eig(R);
+
+<span class="comment">% check that R = V * D * V';</span>
+err = R - V * D * V';
+max(abs(err(:)))
+</pre><pre class="codeoutput">
+ans =
+
+   1.1369e-11
+
+</pre><pre class="codeinput"><span class="comment">% eigenvalues</span>
+diag(D)
+</pre><pre class="codeoutput">
+ans =
+
+   1.0e+04 *
+
+    1.7574
+    0.0380
+    0.0119
+    0.0051
+    0.0024
+    0.0007
+    0.0001
+    0.0000
+
+</pre><h2>Display PCA basis vectors<a name="9"></a></h2><p>Notice how similar the PCA basis vectors are to the DCT basis vectors! The first vector is a constant vector (approximately); the 2nd vector is like a half-cycle of a cosine waveform; the 3rd vector is like a whole cycle of a cosine waveform; etc.</p><pre class="codeinput">figure(4)
+clf
+<span class="keyword">for</span> k = 1:8
+    subplot(4,2,k)
+    plot(0:7, V(:,k), <span class="string">'.-'</span>, <span class="string">'markersize'</span>, 12)
+    box <span class="string">off</span>
+    xlim([0 7])
+    ylim([-1 1])
+<span class="keyword">end</span>
+orient <span class="string">landscape</span>
+print <span class="string">-dpdf</span> <span class="string">PCA_from_image_data</span>
+</pre><img vspace="5" hspace="5" src="PCA_from_image_data_04.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+%% Transforms - PCA
+% Find PCA for image data
+
+
+%% Start
+
+clear
+
+%% Load image
+
+a = imread('IMG_2616.jpg');
+a = rgb2gray(a);
+a = double(a);
+
+figure(1)
+clf
+imagesc(a);
+colormap gray
+axis image
+
+%% Extract sequences of length 8
+
+% Ensure that the number of rows is a multiple of 8
+[N1, N2] = size(a);
+M1 = 8*floor(N1/8);
+a = a(1:M1,:);
+
+% convert to single one-dimensional array
+x = a(:);
+
+% reshape into array where each column is an 8-point sequence
+x = reshape(x,8,M1*N2/8);
+
+size(x)
+
+%% Compute and remove mean
+
+m = mean(x,2);      % average 8-point sequence
+figure(2)
+clf
+plot(m)
+ylim([0 255])
+box off
+title('mean 8-point signal')   % note: practically a constant!
+
+% Subtract 8-point mean signal from each 8-point signal
+x2 = bsxfun(@minus, x, m);
+
+%% Compute covariance matrix
+
+N = size(x2,2);
+R = (1/N) * x2 * (x2');
+
+size(R)
+
+%%
+
+figure(3)
+clf
+imagesc(R)
+colormap(gray)
+axis image
+
+%% Compute PCA
+% Perform eigen decomposition of covariance matrix.
+% The orthonormal matrix of eigenvectors is the KLT
+
+[V, D] = eig(R);
+
+% check that R = V * D * V';
+err = R - V * D * V';
+max(abs(err(:)))
+
+%%
+
+% eigenvalues
+diag(D)
+
+%% Display PCA basis vectors
+% Notice how similar the PCA basis vectors are to the DCT basis vectors!
+% The first vector is a constant vector (approximately);
+% the 2nd vector is like a half-cycle of a cosine waveform;
+% the 3rd vector is like a whole cycle of a cosine waveform; etc.
+
+figure(4)
+clf
+for k = 1:8
+    subplot(4,2,k)
+    plot(0:7, V(:,k), '.-', 'markersize', 12)
+    box off
+    xlim([0 7])
+    ylim([-1 1])
+end
+orient landscape
+print -dpdf PCA_from_image_data
+
+
+
+
+##### SOURCE END #####
+--></body></html>

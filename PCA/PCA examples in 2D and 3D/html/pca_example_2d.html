@@ -1,0 +1,235 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Illustration of 2D PCA</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-04-20"><meta name="DC.source" content="pca_example_2d.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Illustration of 2D PCA</h1><!--introduction--><p>This code illustrates PCA for a 'toy' example. PCA gives a way to approximate an N-point vector by an M-point vector with M &lt; N.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Start</a></li><li><a href="#2">Make data for example</a></li><li><a href="#3">Compute PCA matrix</a></li><li><a href="#4">Transform data to new coordinates</a></li><li><a href="#5">Approximate each data vector using one value</a></li><li><a href="#6">Transform back to original coordinates</a></li></ul></div><h2>Start<a name="1"></a></h2><pre class="codeinput">clear
+close <span class="string">all</span>
+
+set(0, <span class="string">'DefaultLineMarkerSize'</span>, 10);
+</pre><h2>Make data for example<a name="2"></a></h2><pre class="codeinput">L = 200;  <span class="comment">% number of data points</span>
+
+<span class="comment">% generate data for example</span>
+C = [1 2; 1 1];
+X = C * randn(2,L);
+
+<span class="comment">% display data</span>
+plot(X(1,:),X(2,:),<span class="string">'b.'</span>)
+grid
+axis([-1 1 -1 1]*8)
+axis <span class="string">square</span>
+
+<span class="comment">% data is zero mean - no need to subtract mean first.</span>
+</pre><img vspace="5" hspace="5" src="pca_example_2d_01.png" alt=""> <h2>Compute PCA matrix<a name="3"></a></h2><pre class="codeinput">A = X * X';     <span class="comment">% data covariance matrix</span>
+
+<span class="comment">% compute eigenvectors and eigenvalues</span>
+[E,D] = eig(A);
+
+<span class="comment">% check that A = E D E'</span>
+err = A - E * D * E';
+max(abs(err(:)))
+
+<span class="comment">% eigevalues in descending order</span>
+d = diag(D);
+[tmp, k] = sort(-d);
+
+<span class="comment">% resort</span>
+d = d(k)
+D = diag(d);
+E = E(:,k);
+
+<span class="comment">% check that A = E D E'</span>
+err = A - E * D * E';
+max(abs(err(:)))
+
+<span class="comment">% Set P matrix</span>
+P = E';
+</pre><pre class="codeoutput">ans =
+   1.1369e-13
+d =
+   1.0e+03 *
+    1.2473
+    0.0250
+ans =
+   1.1369e-13
+</pre><h2>Transform data to new coordinates<a name="4"></a></h2><p>Decorrelate data</p><pre class="codeinput"><span class="comment">% transform data</span>
+Y = P * X;
+
+<span class="comment">% display transformed data</span>
+plot(Y(1,:),Y(2,:),<span class="string">'b.'</span>)
+grid
+axis([-1 1 -1 1]*8)
+axis <span class="string">square</span>
+</pre><img vspace="5" hspace="5" src="pca_example_2d_02.png" alt=""> <h2>Approximate each data vector using one value<a name="5"></a></h2><pre class="codeinput">Y(2,:) = 0;
+
+<span class="comment">% display approximate data</span>
+plot(Y(1,:), Y(2,:),<span class="string">'b.'</span>)
+grid
+axis([-1 1 -1 1]*8)
+axis <span class="string">square</span>
+</pre><img vspace="5" hspace="5" src="pca_example_2d_03.png" alt=""> <h2>Transform back to original coordinates<a name="6"></a></h2><pre class="codeinput">X_approx = P'*Y;
+
+<span class="comment">% display approximate data</span>
+plot(X_approx(1,:),X_approx(2,:),<span class="string">'b.'</span>)
+grid
+axis([-1 1 -1 1]*8)
+axis <span class="string">square</span>
+</pre><img vspace="5" hspace="5" src="pca_example_2d_04.png" alt=""> <pre class="codeinput">set(0, <span class="string">'DefaultLineMarkerSize'</span>, <span class="string">'remove'</span>);
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Illustration of 2D PCA
+% This code illustrates PCA for a 'toy' example.
+% PCA gives a way to approximate an N-point vector 
+% by an M-point vector with M < N.
+
+%% Start
+
+clear
+close all
+
+set(0, 'DefaultLineMarkerSize', 10);
+
+%% Make data for example
+
+L = 200;  % number of data points
+
+% generate data for example
+C = [1 2; 1 1];
+X = C * randn(2,L);
+
+% display data
+plot(X(1,:),X(2,:),'b.')
+grid
+axis([-1 1 -1 1]*8)
+axis square
+
+% data is zero mean - no need to subtract mean first.
+
+%% Compute PCA matrix
+
+A = X * X';     % data covariance matrix
+
+% compute eigenvectors and eigenvalues
+[E,D] = eig(A);
+
+% check that A = E D E'
+err = A - E * D * E';
+max(abs(err(:)))
+
+% eigevalues in descending order
+d = diag(D);
+[tmp, k] = sort(-d);
+
+% resort
+d = d(k) 
+D = diag(d);
+E = E(:,k);
+
+% check that A = E D E'
+err = A - E * D * E';
+max(abs(err(:)))
+
+% Set P matrix
+P = E';
+
+%% Transform data to new coordinates
+% Decorrelate data
+
+% transform data
+Y = P * X;
+
+% display transformed data
+plot(Y(1,:),Y(2,:),'b.')
+grid
+axis([-1 1 -1 1]*8)
+axis square
+
+%% Approximate each data vector using one value
+
+Y(2,:) = 0;
+
+% display approximate data
+plot(Y(1,:), Y(2,:),'b.')
+grid
+axis([-1 1 -1 1]*8)
+axis square
+
+%% Transform back to original coordinates
+
+X_approx = P'*Y;
+
+% display approximate data
+plot(X_approx(1,:),X_approx(2,:),'b.')
+grid
+axis([-1 1 -1 1]*8)
+axis square
+
+%%
+
+set(0, 'DefaultLineMarkerSize', 'remove');
+
+##### SOURCE END #####
+--></body></html>
