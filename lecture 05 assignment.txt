@@ -1,0 +1,13 @@
+
+Lecture 05 Assignment
+
+Exercises to submit:
+
+Demo 13 (FFT and numpy) - Exercise 1
+Demo 14 (blocking and AM) - Exercise 3
+Demo 15 (Block filtering) - Exercise 2
+Demo 16 (Keypress) - Exercise 1
+Demo 17 (TKinter) - Exercise 1
+
+Start reading Chapters 3 and 4 in 'Audio Effects: Theory, Implementation and Application'
+

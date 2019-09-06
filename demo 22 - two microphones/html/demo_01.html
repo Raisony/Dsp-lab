@@ -1,0 +1,446 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Cross-correlation demo</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-10-18"><meta name="DC.source" content="demo_01.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>Cross-correlation demo</h1><!--introduction--><p>Estimate distance between two microphones using cross-correlation of left and right channels of a stereo audio recording. The recorded sterio audio is a shshshsh, aaaaaahh, or a whistle.</p><p>DSP Lab - Ivan Selesnick.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Load data</a></li><li><a href="#2">Listen to audio</a></li><li><a href="#3">Display audio signal</a></li><li><a href="#4">Extract one segment</a></li><li><a href="#6">Auto-correlation</a></li><li><a href="#9">Cross-correlation</a></li><li><a href="#11">Estimate delay (in samples)</a></li><li><a href="#14">Estimate delay (in seconds)</a></li><li><a href="#15">Do the signals roughly line up?</a></li><li><a href="#17">Estimate inter-microphone distance</a></li></ul></div><h2>Load data<a name="1"></a></h2><pre class="codeinput">clear
+
+<span class="comment">% AAAAAAAAHH</span>
+[x, fs] = audioread(<span class="string">'stereo_aahh.wav'</span>);
+t0 = 2.2;
+xlim1 = [0.07 0.085];
+
+<span class="comment">% SHSHSHSH</span>
+<span class="comment">% [x, fs] = audioread('stereo_shsh.wav');</span>
+<span class="comment">% t0 = 2.5;</span>
+<span class="comment">% xlim1 = [0.075 0.08];</span>
+
+<span class="comment">% WHISTLE</span>
+<span class="comment">% [x, fs] = audioread('stereo_whistle.wav');</span>
+<span class="comment">% t0 = 3.0;</span>
+<span class="comment">% xlim1 = [0.07 0.085];</span>
+
+fs      <span class="comment">% Sampling rate (samples/second)</span>
+</pre><pre class="codeoutput">fs =
+       48000
+</pre><h2>Listen to audio<a name="2"></a></h2><pre class="codeinput">soundsc(x, fs);
+</pre><h2>Display audio signal<a name="3"></a></h2><pre class="codeinput">N = length(x);
+n = 1:N;
+t = n/fs;
+
+x1 = x(:, 1);       <span class="comment">% Channel 1</span>
+x2 = x(:, 2);       <span class="comment">% Channel 2</span>
+
+figure(1)
+clf
+plot(t, x1, t, x2)
+title(<span class="string">'Audio signal'</span>)
+legend(<span class="string">'x1(t)'</span>, <span class="string">'x2(t)'</span>)
+xlabel(<span class="string">'Time (seconds)'</span>)
+zoom <span class="string">xon</span>
+</pre><img vspace="5" hspace="5" src="demo_01_01.png" alt=""> <h2>Extract one segment<a name="4"></a></h2><p>from both channels</p><pre class="codeinput">T = 0.2;        <span class="comment">% Duration of segment (seconds)</span>
+<span class="comment">% t0 = 3.0;       % Start-time of segment</span>
+
+M = round( T * fs );
+m = 1:M;
+v1 = x1(round(t0*fs) + m);
+v2 = x2(round(t0*fs) + m);
+
+figure(1)
+clf
+plot(m/fs, v1, m/fs, v2)
+title(<span class="string">'Audio signal segment'</span>)
+xlabel(<span class="string">'Time (seconds)'</span>)
+legend(<span class="string">'x1(t)'</span>, <span class="string">'x2(t)'</span>)
+zoom <span class="string">xon</span>
+</pre><img vspace="5" hspace="5" src="demo_01_02.png" alt=""> <pre class="codeinput"><span class="comment">% Zoom view</span>
+xlim(xlim1)
+</pre><img vspace="5" hspace="5" src="demo_01_03.png" alt=""> <h2>Auto-correlation<a name="6"></a></h2><pre class="codeinput">flip = @(x) x(end:-1:1);
+
+r11 = conv(v1, flip(v1));
+
+figure(1)
+clf
+plot(1-M:M-1, r11)
+title(<span class="string">'Auto-correlation of one channel'</span>)
+xlabel(<span class="string">'Lag (samples)'</span>)
+zoom <span class="string">xon</span>
+</pre><img vspace="5" hspace="5" src="demo_01_04.png" alt=""> <pre class="codeinput"><span class="comment">% Zoom view</span>
+xlim([-600 600])
+<span class="comment">% xlim([-200 200])</span>
+</pre><img vspace="5" hspace="5" src="demo_01_05.png" alt=""> <pre class="codeinput">[r11_max, k] = max(r11);
+
+lag_max = k - M
+
+hold <span class="string">on</span>
+plot(lag_max, r11_max, <span class="string">'ro'</span>)
+grid <span class="string">on</span>
+</pre><pre class="codeoutput">lag_max =
+     0
+</pre><img vspace="5" hspace="5" src="demo_01_06.png" alt=""> <h2>Cross-correlation<a name="9"></a></h2><pre class="codeinput">r12 = conv(v1, flip(v2));
+
+<span class="comment">% The Matlab function xcorr can also be used here.</span>
+<span class="comment">% r12 = xcorr(v1, v2);</span>
+
+figure(1)
+clf
+plot(1-M:M-1, r12)
+title(<span class="string">'Cross-correlation between left and right channels'</span>)
+xlabel(<span class="string">'Lag (samples)'</span>)
+zoom <span class="string">xon</span>
+</pre><img vspace="5" hspace="5" src="demo_01_07.png" alt=""> <pre class="codeinput"><span class="comment">% Zoom view</span>
+xlim([-600 600])
+</pre><img vspace="5" hspace="5" src="demo_01_08.png" alt=""> <h2>Estimate delay (in samples)<a name="11"></a></h2><p>as peak cross-correlation</p><pre class="codeinput">[r12_max, k] = max(r12);    <span class="comment">% r12_max : Peak cross-correlation</span>
+
+lag_max = k - M   <span class="comment">% lag_max : Lag at which cross-correlation peaks</span>
+
+hold <span class="string">on</span>
+plot(lag_max, r12_max, <span class="string">'ro'</span>)
+grid <span class="string">on</span>
+</pre><pre class="codeoutput">lag_max =
+    80
+</pre><img vspace="5" hspace="5" src="demo_01_09.png" alt=""> <p>Show lag in units of seconds, not samples</p><pre class="codeinput">figure(1)
+clf
+plot((1-M:M-1)/fs, r12)
+title(<span class="string">'Cross-correlation between left and right channels'</span>)
+xlabel(<span class="string">'Lag (seconds)'</span>)
+</pre><img vspace="5" hspace="5" src="demo_01_10.png" alt=""> <pre class="codeinput"><span class="comment">% Zoom view</span>
+xlim([-600 600]/fs)
+</pre><img vspace="5" hspace="5" src="demo_01_11.png" alt=""> <h2>Estimate delay (in seconds)<a name="14"></a></h2><pre class="codeinput">tau = lag_max / fs  <span class="comment">% Peak lag in seconds</span>
+
+txt = sprintf(<span class="string">'Estimated inter-microphone time delay = %.2f milliseconds'</span>, 1000*tau)
+
+hold <span class="string">on</span>
+plot(tau, r12_max, <span class="string">'ro'</span>)
+grid <span class="string">on</span>
+</pre><pre class="codeoutput">tau =
+    0.0017
+txt =
+Estimated inter-microphone time delay = 1.67 milliseconds
+</pre><img vspace="5" hspace="5" src="demo_01_12.png" alt=""> <h2>Do the signals roughly line up?<a name="15"></a></h2><pre class="codeinput">figure(1)
+clf
+plot(m/fs, v1, (m + lag_max)/fs, v2)
+title(<span class="string">'Audio signal'</span>)
+xlabel(<span class="string">'Time (seconds)'</span>)
+legend(<span class="string">'x1(t)'</span>, <span class="string">'x2(t-\tau)'</span>)
+zoom <span class="string">xon</span>
+
+<span class="comment">% Zoom view</span>
+xlim(xlim1)
+</pre><img vspace="5" hspace="5" src="demo_01_13.png" alt=""> <pre class="codeinput">figure(1)
+clf
+
+subplot(3, 1, 1)
+plot(m/fs, v1, m/fs, v2)
+title(<span class="string">'Audio signal'</span>)
+xlabel(<span class="string">'Time (seconds)'</span>)
+legend(<span class="string">'x1(t)'</span>, <span class="string">'x2(t)'</span>)
+xlim(xlim1)
+
+subplot(3, 1, 2)
+
+plot(m/fs, v1, (m + lag_max)/fs, v2)
+xlim([0 T])
+title(<span class="string">'Audio signal'</span>)
+xlabel(<span class="string">'Time (seconds)'</span>)
+legend(<span class="string">'x1(t)'</span>, <span class="string">'x2(t-\tau)'</span>)
+xlim(xlim1)
+
+subplot(3, 1, 3)
+plot((1-M:M-1)/fs*1000, r12, tau*1000, r12_max, <span class="string">'ro'</span>)
+title(<span class="string">'Cross-correlation between left and right channels'</span>)
+xlabel({<span class="string">'Lag (milliseconds)'</span>, txt})
+grid <span class="string">on</span>
+xlim([-4 4])
+
+orient <span class="string">tall</span>
+<span class="comment">% print -dpdf demo_01_SHSHSHSH</span>
+</pre><img vspace="5" hspace="5" src="demo_01_14.png" alt=""> <h2>Estimate inter-microphone distance<a name="17"></a></h2><pre class="codeinput"><span class="comment">% Speed of sound at sea level = 340.29 m/s</span>
+
+sos = 340.29;   <span class="comment">% speed of sound (meters/second)</span>
+
+dist = tau * sos;
+
+fprintf(<span class="string">'Estimated inter-microphone distance = %.2f meters\n'</span>, dist)
+</pre><pre class="codeoutput">Estimated inter-microphone distance = 0.57 meters
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% Cross-correlation demo
+% Estimate distance between two microphones using 
+% cross-correlation of left and right channels of a 
+% stereo audio recording. 
+% The recorded sterio audio is a shshshsh, aaaaaahh, or a whistle.
+%
+% DSP Lab - Ivan Selesnick.
+
+%% Load data
+
+clear
+
+% AAAAAAAAHH
+[x, fs] = audioread('stereo_aahh.wav');
+t0 = 2.2;
+xlim1 = [0.07 0.085];
+
+% SHSHSHSH
+% [x, fs] = audioread('stereo_shsh.wav');
+% t0 = 2.5;
+% xlim1 = [0.075 0.08];
+
+% WHISTLE
+% [x, fs] = audioread('stereo_whistle.wav');
+% t0 = 3.0;
+% xlim1 = [0.07 0.085];
+
+fs      % Sampling rate (samples/second)
+
+%% Listen to audio
+
+soundsc(x, fs);
+
+%% Display audio signal
+
+N = length(x);
+n = 1:N;
+t = n/fs;
+
+x1 = x(:, 1);       % Channel 1
+x2 = x(:, 2);       % Channel 2
+
+figure(1)
+clf
+plot(t, x1, t, x2)
+title('Audio signal')
+legend('x1(t)', 'x2(t)')
+xlabel('Time (seconds)')
+zoom xon
+
+
+%% Extract one segment
+% from both channels
+
+T = 0.2;        % Duration of segment (seconds)
+% t0 = 3.0;       % Start-time of segment
+
+M = round( T * fs ); 
+m = 1:M;
+v1 = x1(round(t0*fs) + m);
+v2 = x2(round(t0*fs) + m);
+
+figure(1)
+clf
+plot(m/fs, v1, m/fs, v2)
+title('Audio signal segment')
+xlabel('Time (seconds)')
+legend('x1(t)', 'x2(t)')
+zoom xon
+
+%% 
+
+% Zoom view
+xlim(xlim1)
+
+%% Auto-correlation
+
+flip = @(x) x(end:-1:1);
+
+r11 = conv(v1, flip(v1));
+
+figure(1)
+clf
+plot(1-M:M-1, r11)
+title('Auto-correlation of one channel')
+xlabel('Lag (samples)')
+zoom xon
+
+%%
+
+% Zoom view
+xlim([-600 600])
+% xlim([-200 200])
+
+%%
+
+[r11_max, k] = max(r11);
+
+lag_max = k - M
+
+hold on
+plot(lag_max, r11_max, 'ro')
+grid on
+
+%% Cross-correlation
+
+r12 = conv(v1, flip(v2));
+
+% The Matlab function xcorr can also be used here.
+% r12 = xcorr(v1, v2);
+
+figure(1)
+clf
+plot(1-M:M-1, r12)
+title('Cross-correlation between left and right channels')
+xlabel('Lag (samples)')
+zoom xon
+
+%%
+
+% Zoom view
+xlim([-600 600])
+
+%% Estimate delay (in samples)
+% as peak cross-correlation
+
+[r12_max, k] = max(r12);    % r12_max : Peak cross-correlation
+
+lag_max = k - M   % lag_max : Lag at which cross-correlation peaks
+
+hold on
+plot(lag_max, r12_max, 'ro')
+grid on
+
+%%
+% Show lag in units of seconds, not samples
+
+figure(1)
+clf
+plot((1-M:M-1)/fs, r12)
+title('Cross-correlation between left and right channels')
+xlabel('Lag (seconds)')
+
+%%
+
+% Zoom view
+xlim([-600 600]/fs)
+
+%% Estimate delay (in seconds)
+
+tau = lag_max / fs  % Peak lag in seconds
+
+txt = sprintf('Estimated inter-microphone time delay = %.2f milliseconds', 1000*tau)
+
+hold on
+plot(tau, r12_max, 'ro')
+grid on
+
+%% Do the signals roughly line up?
+
+figure(1)
+clf
+plot(m/fs, v1, (m + lag_max)/fs, v2)
+title('Audio signal')
+xlabel('Time (seconds)')
+legend('x1(t)', 'x2(t-\tau)')
+zoom xon
+
+% Zoom view
+xlim(xlim1)
+
+
+%%
+
+figure(1)
+clf
+
+subplot(3, 1, 1)
+plot(m/fs, v1, m/fs, v2)
+title('Audio signal')
+xlabel('Time (seconds)')
+legend('x1(t)', 'x2(t)')
+xlim(xlim1)
+
+subplot(3, 1, 2)
+
+plot(m/fs, v1, (m + lag_max)/fs, v2)
+xlim([0 T])
+title('Audio signal')
+xlabel('Time (seconds)')
+legend('x1(t)', 'x2(t-\tau)')
+xlim(xlim1)
+
+subplot(3, 1, 3)
+plot((1-M:M-1)/fs*1000, r12, tau*1000, r12_max, 'ro')
+title('Cross-correlation between left and right channels')
+xlabel({'Lag (milliseconds)', txt})
+grid on
+xlim([-4 4])
+
+orient tall
+% print -dpdf demo_01_SHSHSHSH
+
+
+%% Estimate inter-microphone distance
+
+% Speed of sound at sea level = 340.29 m/s
+
+sos = 340.29;   % speed of sound (meters/second)
+
+dist = tau * sos;
+
+fprintf('Estimated inter-microphone distance = %.2f meters\n', dist)
+
+##### SOURCE END #####
+--></body></html>

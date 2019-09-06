@@ -1,0 +1,13 @@
+
+Lecture 04 Assignment
+
+Exercises to submit:
+
+Demo 10, exercise 3
+Demo 11, exercise 2
+Demo 12, real-time KS algorithm using PyAudio (details to be announced)
+
+Reading: 
+Chapter 2: Delay Line Effects
+in 'Audio Effects: Theory, Implementation and Application'
+

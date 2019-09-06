@@ -1,0 +1,44 @@
+
+Lecture 04
+
+09 - circular buffer (long buffer)10 - vibrato11 - plotting12 - guitar (Karplus-Strong)
+	
+-----------------------------------------------
+
+demo 09 - Circular buffer (long buffer)
+
+   - two versions: 
+
+    From Lecture 03:
+    1) buffer length = delay in samples
+    buffer uses one index
+
+    New in Lecture 04:
+    2) buffer length > delay in samples
+    buffer uses two indices
+      one index for reading, one index for writing
+    useful when delay is time-varying
+
+
+demo 10 - Vibrato 
+
+Vibrato
+  - play_vibrato_simple.py
+  - time-varyring delay
+  - non-recursive 
+  - no interpolation 
+  - read wave file
+	- save to wave file, write each block to wave file...
+  - with interpolation 
+
+  - more effects: flanger, chorus, etc
+
+
+demo 11 - audio plotting
+
+demo 12 - Guitar (Karplus-Strong algorithm)
+
+
+-----------------------------------------------
+
+
