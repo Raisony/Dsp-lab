@@ -1,0 +1,26 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1265\cocoasubrtf210
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww24960\viewh27620\viewkind1
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f0\b\fs24 \cf0 Demo Programs
+\b0 \
+\
+draw_shapes.py\
+This demo program takes the cat image as a canvas, and draws a several shapes including lines, circles and rectangles on it. \
+\
+
+\b cv2 functions
+\b0 \
+\
+cv2.line(img, pt1, pt2, color, thickness)\
+This function draws a line on an image, with end points pt1 and pt2. The color is passed as 3-tuple which is represented in the BGR form. Thickness indicates how many pixels wide the line is.\
+\
+cv2.rectangle(img, pt1, pt2, color, thickness)\
+This function draws a rectangle on the image, with end points pt1 and pt2. Thickness indicates how many pixels wide the border is. If this value is negative, then the rectangle will be opaque. \
+\
+cv2.circle(img, centre, radius, color, thickness)\
+This function draws a circle on the image with the given center and radius. It follows the same representation for color and thickness as above. \
+\
+}

@@ -1,0 +1,50 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1265\cocoasubrtf210
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;\red34\green34\blue34;}
+\margl1440\margr1440\vieww24960\viewh27620\viewkind1
+\deftab720
+\pard\pardeftab720\ri340
+
+\f0\b\fs24 \cf0 Demo Programs
+\b0 \
+\
+
+\b scaling.py\
+
+\b0 This demo program resizes the image by the specified factors in the x and y directions.\
+\
+
+\b translation.py\
+
+\b0 This demo program shifts the image by a specified number of pixels in both the x and y directions. To perform translation, we specify a transformation matrix M of the form \
+M = [ 1    0    tx\
+         0    1    ty ]\
+where\
+tx is the translation in the x direction\
+ty is the translation in the y direction\
+\
+
+\b rotation.py\
+
+\b0 This program rotates the image by 45\cf2 \'b0. This value can be adjusted.\
+\
+
+\b CV2 functions demonstrated\
+
+\b0 \
+
+\b cv2.resize(img, dst, fx = , fy = )\cf0 \
+
+\b0 \cf2 This function scales the image by the factors fx (horizontal) and fy (vertical). The first argument is the image. The second argument is the size of the output image. For this application, we set that to (0,0) or None. That indicates that the size of the output image will be computed by taking into account the scaling factors.\
+\
+
+\b cv2.warpAffine(img, M, output_size)
+\b0 \
+This function performs an affine transformation of an image. In the translation example, the transformation matrix, M is such that it performs only translation and no rotation. However, it can be used to perform rotation as well, as seen in the rotation example, where the transformation matrix is quite different. The output size is represented as width x height. Since columns corresponds to the width and rows corresponds to the height, it would be of the form (col, row)\
+\
+\pard\pardeftab720\ri340
+
+\b \cf0 cv2.getRotationMatrix2D(centre, angle, scale)
+\b0 \
+This function gets the transformation matrix for performing rotation. Here, the centre corresponds to the point of the image about which rotation is to be performed. It is (col/2, row/2), since we perform rotation about the centre of the image. The angle is expressed in degrees, and scale is used to indicate the amount of scaling. Since our examples for translation and rotation don\'92t need to be scaled, we set scale as 1. \
+}

@@ -1,0 +1,72 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1265\cocoasubrtf210
+{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww18760\viewh19900\viewkind1
+\deftab720
+\pard\pardeftab720\ri340
+
+\f0\b\fs24 \cf0 Demo programs\
+\pard\pardeftab720\ri340
+
+\b0 \cf0 \
+These demo programs introduce the very basic functionality of opencv.\
+\
+\pard\pardeftab720\ri340
+
+\b \cf0 grayscale.py\
+\pard\pardeftab720\ri340
+
+\b0 \cf0 This demo program reads an image from a file (cat.jpg) as a gray scale image, displays the image on the screen, and writes it to a file (cat_gray.jpg)\
+\
+\pard\pardeftab720\ri340
+
+\b \cf0 color.py
+\b0 \
+This demo program reads an image from a file (cat.jpg) as a color image, displays the image on the screen, and writes it to a file (cat_color.jpg).\
+\
+
+\b show_rgb.py, show_hsv.py
+\b0 \
+Display individual color channels\
+\
+
+\b CV2 functions demonstrated\
+\
+cv2.imread(filename, 0 or 1)\
+\pard\pardeftab720\ri340
+
+\b0 \cf0 This function is used to read an image from a file. Passing a flag of 0 indicates that the image will be read as a grayscale image, while passing a flag of 1 indicates that the image will be read as a color image. It returns an array (2D for grayscale, 3D for color images).\
+\
+\pard\pardeftab720\ri340
+
+\b \cf0 cv2.imshow(title, img)\
+\pard\pardeftab720\ri340
+
+\b0 \cf0 This function displays an image on the screen. The first argument (a string) is the title of the image window. The second argument is the image array. The image should be a 2D array if the image is a grayscale image, and a 3D array if the image is a color image.\
+\
+\pard\pardeftab720\ri340
+
+\b \cf0 cv2.imwrite(filename, img)\
+\pard\pardeftab720\ri340
+
+\b0 \cf0 This function writes an image to a file. The first argument is a string. It must end with .png or .jpg. The second argument is the image array.\
+\
+\pard\pardeftab720\ri340
+
+\b \cf0 cv2.waitKey(time)\
+\pard\pardeftab720\ri340
+
+\b0 \cf0 The argument time is in milliseconds. The function waits for a specified number of milliseconds for any keyboard event. The program proceeds once a key is pressed or once the specified time has elapsed.  If time = 0, then the program waits indefinitely for a key stroke.\
+\
+\pard\pardeftab720\ri340
+
+\b \cf0 cv2.destroyAllWindows()\
+\pard\pardeftab720\ri340
+
+\b0 \cf0 This functions closes all windows that were created.\
+\
+\pard\pardeftab720\ri340
+
+\b \cf0 Note: 
+\b0 While displaying or writing the image, it should be of type uint8. \
+}
