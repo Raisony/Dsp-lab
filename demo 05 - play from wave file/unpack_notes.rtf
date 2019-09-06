@@ -1,0 +1,60 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1265\cocoasubrtf210
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww25160\viewh27100\viewkind1
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f0\b\fs24 \cf0 pack function\
+
+\b0 Show the use of the 
+\i unpack
+\i0  function\
+Note: the unpack function produces a 
+\i tuple
+\i0 \
+\
+
+\b About the unpack function
+\b0 \
+https://docs.python.org/3/library/struct.html\
+\
+
+\b In python: 
+\b0 \
+>>> import struct\
+\
+>>> s = struct.pack('h', 2)\
+>>> s\
+	b'\\x02\\x00'\
+\
+>>> x = struct.unpack('h', s)\
+>>> x\
+	(2,)		# THIS IS A TUPLE WITH ONE ELEMENT\
+\
+>>> type(x)\
+	<class 'tuple'>\
+\
+>>> s = struct.pack('hh', 2, 3)\
+\
+>>> s\
+	b'\\x02\\x00\\x03\\x00'\
+\
+>>> x = struct.unpack('hh', s)\
+>>> x\
+	(2, 3)    # THIS IS A TUPLE WITH TWO ELEMENTS\
+\
+>>> type(x)\
+	<class 'tuple'>\
+\
+
+\b Play a wave (WAV) file using PyAudio
+\b0 \
+\
+In the demo file 'play_wave_mono.py', what if the gain is very high? How does that affect the sound?\
+\
+
+\b Activity for student
+\b0 \
+\
+There are separate demo files for mono and stereo wave (WAV) files. Instead of two separate programs for mono and stereo files, write a single Python program that can handle both. Your program should first determine if the file is mono or stereo by reading the wave file information.\
+}

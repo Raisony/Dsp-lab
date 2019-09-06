@@ -1,0 +1,33 @@
+
+Lecture 03
+
+demo 05 - play from wav file
+
+  unpack (produces tuples!)
+    function: unpack
+
+  read wave file into Python
+    function: readframes in wave module
+
+demo 06 - filter and play from wav file
+
+  Implement a recursive filter, as applied to signal read from a wav file.
+
+demo 07 - filter and play from mic
+
+  Use microphone input
+    function: read in PyAudio module
+
+    microphone input -> band-pass filter -> speaker output
+
+    single frame (no blocking)
+
+
+demo 08 - circular buffer
+
+  Implement an echo via a circular buffer
+  A circular buffer implements a high-order delay
+	without data shuffling in the
+	difference equation implementation.
+
+

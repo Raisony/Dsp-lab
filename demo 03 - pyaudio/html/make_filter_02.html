@@ -1,0 +1,217 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>make_filter_02.m</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-09-12"><meta name="DC.source" content="make_filter_02.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>make_filter_02.m</h1><!--introduction--><p>Second-order recursive difference equation with prescribed poles.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Difference equation</a></li><li><a href="#3">Impulse response</a></li><li><a href="#4">Listen</a></li><li><a href="#5">Pole-zero plot</a></li><li><a href="#6">Frequency response</a></li></ul></div><pre class="codeinput">clc
+clear
+</pre><h2>Difference equation<a name="2"></a></h2><p>y(n) = b0 x(n) - a1 y(n-1) - a2 y(n-2)</p><pre class="codeinput">Fs = 8000;          <span class="comment">% sampling frequency (sample/second)</span>
+F1 = 400;           <span class="comment">% frequency (cycles/second) (Hz)</span>
+f1 = F1/Fs          <span class="comment">% normalized frequency (cycles/sample)</span>
+om1 = 2*pi * f1;    <span class="comment">% normalized frequency (radians/sample)</span>
+
+Ta = 0.5;           <span class="comment">% duration (seconds) [time till 1% amplitude]</span>
+Na = Ta * Fs;
+r = 0.01^(1/Na)
+
+a1 = -2*r*cos(om1);
+a2 = r^2;
+
+a = [1 a1 a2]       <span class="comment">% recursive part</span>
+b = 1;              <span class="comment">% non-recursive part</span>
+</pre><pre class="codeoutput">
+f1 =
+
+    0.0500
+
+
+r =
+
+    0.9988
+
+
+a =
+
+    1.0000   -1.8999    0.9977
+
+</pre><h2>Impulse response<a name="3"></a></h2><p>Note that the amplitude envelope has the form r^n.</p><pre class="codeinput">N = Fs;
+n = 0:N;
+
+imp = [1 zeros(1, N)];
+h = filter(b, a, imp);
+
+figure(1)
+clf
+plot(n/Fs, h)
+title(<span class="string">'Impulse response'</span>);
+xlabel(<span class="string">'Time (sec)'</span>)
+zoom <span class="string">xon</span>
+</pre><img vspace="5" hspace="5" src="make_filter_02_01.png" alt=""> <h2>Listen<a name="4"></a></h2><pre class="codeinput">soundsc(h, Fs)
+</pre><h2>Pole-zero plot<a name="5"></a></h2><p>The poles are at z = r exp(om1 j) and z = r exp(-om1 j)</p><pre class="codeinput">zplane(b, a)
+title(<span class="string">'Pole-zero Plot'</span>)
+zoom <span class="string">on</span>
+
+<span class="comment">% The poles may look like they are on the unit circle,</span>
+<span class="comment">% but luckily they are not!</span>
+</pre><img vspace="5" hspace="5" src="make_filter_02_02.png" alt=""> <h2>Frequency response<a name="6"></a></h2><p>Note that the frequency response has a peak at f1 = 400 Hz</p><pre class="codeinput">[H, om] = freqz(b, a);
+f = om / (2*pi) * Fs;
+plot(f, abs(H))
+title(<span class="string">'Frequency response'</span>)
+xlabel(<span class="string">'Frequency (Hz)'</span>)
+xlim([0 1000])
+grid
+
+<span class="comment">% What is the peak value of the frequency response? (in terms of f1 and r)</span>
+</pre><img vspace="5" hspace="5" src="make_filter_02_03.png" alt=""> <pre class="codeinput">HdB = 20*log10(abs(H));
+
+plot(f, HdB)
+title(<span class="string">'Frequency response (dB)'</span>)
+xlabel(<span class="string">'Frequency (Hz)'</span>)
+xlim([0 1000])
+grid
+</pre><img vspace="5" hspace="5" src="make_filter_02_04.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+%% make_filter_02.m 
+%
+% Second-order recursive difference equation 
+% with prescribed poles.
+
+%%
+
+clc
+clear
+
+%% Difference equation
+% y(n) = b0 x(n) - a1 y(n-1) - a2 y(n-2)
+
+Fs = 8000;          % sampling frequency (sample/second)
+F1 = 400;           % frequency (cycles/second) (Hz)
+f1 = F1/Fs          % normalized frequency (cycles/sample)
+om1 = 2*pi * f1;    % normalized frequency (radians/sample)
+
+Ta = 0.5;           % duration (seconds) [time till 1% amplitude]
+Na = Ta * Fs;
+r = 0.01^(1/Na)
+
+a1 = -2*r*cos(om1);
+a2 = r^2;
+   
+a = [1 a1 a2]       % recursive part
+b = 1;              % non-recursive part
+
+%% Impulse response
+% Note that the amplitude envelope has the form r^n.
+
+N = Fs;
+n = 0:N;
+
+imp = [1 zeros(1, N)];
+h = filter(b, a, imp);
+
+figure(1)
+clf
+plot(n/Fs, h)
+title('Impulse response');
+xlabel('Time (sec)')
+zoom xon
+
+%% Listen
+
+soundsc(h, Fs)
+
+%% Pole-zero plot
+% The poles are at z = r exp(om1 j) and z = r exp(-om1 j)
+
+zplane(b, a)
+title('Pole-zero Plot')
+zoom on
+
+% The poles may look like they are on the unit circle,
+% but luckily they are not!
+
+%% Frequency response
+% Note that the frequency response has a peak at f1 = 400 Hz
+
+[H, om] = freqz(b, a);
+f = om / (2*pi) * Fs;
+plot(f, abs(H))
+title('Frequency response')
+xlabel('Frequency (Hz)')
+xlim([0 1000])
+grid
+
+% What is the peak value of the frequency response? (in terms of f1 and r)
+
+%%
+
+HdB = 20*log10(abs(H));
+
+plot(f, HdB)
+title('Frequency response (dB)')
+xlabel('Frequency (Hz)')
+xlim([0 1000])
+grid
+
+
+##### SOURCE END #####
+--></body></html>

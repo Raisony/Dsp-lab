@@ -1,0 +1,313 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>make_filter_01.m</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-09-12"><meta name="DC.source" content="make_filter_01.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>make_filter_01.m</h1><!--introduction--><p>Second-order recursive difference equation with prescribed poles.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Difference equation</a></li><li><a href="#3">Impulse response</a></li><li><a href="#4">Pole-zero plot</a></li><li><a href="#5">Frequency response</a></li><li><a href="#6">When does response decay to 1%?</a></li><li><a href="#7">Express in seconds (Ta)</a></li><li><a href="#8">Design system with specified Ta</a></li><li><a href="#9">Make the filter</a></li></ul></div><pre class="codeinput">clc
+clear
+</pre><h2>Difference equation<a name="2"></a></h2><p>y(n) = b0 x(n) - a1 y(n-1) - a2 y(n-2)</p><pre class="codeinput">f1 = 0.2;           <span class="comment">% normalized frequency (cycle/sample)</span>
+om1 = 2*pi * f1;    <span class="comment">% normalized frequency (radian/sample)</span>
+r = 0.8;            <span class="comment">% pole radius</span>
+
+a1 = -2*r*cos(om1);
+a2 = r^2;
+
+a = [1 a1 a2]       <span class="comment">% recursive part (a0 = 1 in the difference equation)</span>
+b = 1;              <span class="comment">% non-recursive part (b0 = 1 in the difference equation)</span>
+</pre><pre class="codeoutput">
+a =
+
+    1.0000   -0.4944    0.6400
+
+</pre><h2>Impulse response<a name="3"></a></h2><p>Calculate the impulse response using the Matlab function 'filter'. Note that the amplitude envelope has the form r^n.</p><pre class="codeinput">N = 50;
+n = 0:N;
+
+imp = [1 zeros(1, N)];
+h = filter(b, a, imp);
+
+figure(1)
+clf
+plot(n, h, <span class="string">'o-'</span>, n, r.^n, <span class="string">'--'</span>)
+legend(<span class="string">'Impulse response'</span>, <span class="string">'Amplitude envelope'</span>)
+xlabel(<span class="string">'Time (n)'</span>)
+title(<span class="string">'Impulse response'</span>)
+</pre><img vspace="5" hspace="5" src="make_filter_01_01.png" alt=""> <h2>Pole-zero plot<a name="4"></a></h2><p>The poles are at z = r exp(om1 j) and z = r exp(-om1 j). This is a complex conjugate pair.</p><pre class="codeinput">zplane(b, a)
+title(<span class="string">'Pole-zero plot'</span>)
+print <span class="string">-dpdf</span> <span class="string">figures/make_filter_01_zplane_1</span>
+</pre><img vspace="5" hspace="5" src="make_filter_01_02.png" alt=""> <h2>Frequency response<a name="5"></a></h2><p>The frequency response has a peak at f1, as expected. (Why is this expected?)</p><pre class="codeinput">[H, om] = freqz(b, a);
+f = om / (2*pi);
+plot(f, abs(H))
+title(<span class="string">'Frequency response'</span>)
+xlabel(<span class="string">'Normalized frequency (cycles/sample)'</span>)
+grid
+print <span class="string">-dpdf</span> <span class="string">figures/make_filter_01_freqz_1</span>
+</pre><img vspace="5" hspace="5" src="make_filter_01_03.png" alt=""> <h2>When does response decay to 1%?<a name="6"></a></h2><p>When does the impulse response decay down to 1% of its initial value?</p><pre class="codeinput">Na = log(0.01) / log(r)     <span class="comment">% samples</span>
+
+plot(n, h, n, r.^n, <span class="string">'--'</span>, [Na Na], [-1 1], <span class="string">'r'</span>)
+xlabel(<span class="string">'Time (n)'</span>)
+title(<span class="string">'Impulse response'</span>)
+</pre><pre class="codeoutput">
+Na =
+
+   20.6377
+
+</pre><img vspace="5" hspace="5" src="make_filter_01_04.png" alt=""> <h2>Express in seconds (Ta)<a name="7"></a></h2><p>If the filter operates at 8000 samples/second, then when does the impulse response decay down to 1% in seconds?</p><pre class="codeinput">Fs = 8000;   <span class="comment">% samples/second</span>
+
+Ta = Na / Fs    <span class="comment">% seconds</span>
+
+plot(n/Fs, h, n/Fs, r.^n, <span class="string">'--'</span>, [Ta Ta], [-1 1], <span class="string">'r'</span>)
+xlabel(<span class="string">'Time (sec)'</span>)
+title(<span class="string">'Impulse response'</span>)
+legend(<span class="string">'Impulse response'</span>, <span class="string">'Amplitude envelope'</span>)
+xlim([0 N/Fs])
+print <span class="string">-dpdf</span> <span class="string">figures/make_filter_01_impresp_1</span>
+</pre><pre class="codeoutput">
+Ta =
+
+    0.0026
+
+</pre><img vspace="5" hspace="5" src="make_filter_01_05.png" alt=""> <h2>Design system with specified Ta<a name="8"></a></h2><p>Let us make a system that has Ta = 0.006 seconds. What should the pole radius be?</p><pre class="codeinput">Ta = 0.006;
+Na = Ta * Fs;
+r = 0.01^(1/Na)
+</pre><pre class="codeoutput">
+r =
+
+    0.9085
+
+</pre><h2>Make the filter<a name="9"></a></h2><p>difference equation</p><pre class="codeinput">a = [1 -2*r*cos(om1) r^2]
+b = 1;
+</pre><pre class="codeoutput">
+a =
+
+    1.0000   -0.5615    0.8254
+
+</pre><p>Pole-zero diagram</p><pre class="codeinput">zplane(b, a)
+title(<span class="string">'Pole-zero plot'</span>)
+print <span class="string">-dpdf</span> <span class="string">figures/make_filter_01_zplane_2</span>
+</pre><img vspace="5" hspace="5" src="make_filter_01_06.png" alt=""> <p>Impulse response</p><pre class="codeinput">h = filter(b, a, imp);
+
+plot(n/Fs, h, n/Fs, r.^n, <span class="string">'--'</span>, [Ta Ta], [-1 1], <span class="string">'r'</span>)
+legend(<span class="string">'Impulse response'</span>, <span class="string">'Amplitude envelope'</span>)
+xlabel(<span class="string">'Time (sec)'</span>)
+title(<span class="string">'Impulse response'</span>)
+xlim([0 N/Fs])
+print <span class="string">-dpdf</span> <span class="string">figures/make_filter_01_impresp_2</span>
+</pre><img vspace="5" hspace="5" src="make_filter_01_07.png" alt=""> <p>Frequency response (How is this frequency response different than the first one?)</p><pre class="codeinput">[H, om] = freqz(b, a);
+f = om / (2*pi);
+plot(f, abs(H))
+title(<span class="string">'Frequency response'</span>)
+xlabel(<span class="string">'Normalized frequency'</span>)
+grid
+print <span class="string">-dpdf</span> <span class="string">figures/make_filter_01_freqz_2</span>
+</pre><img vspace="5" hspace="5" src="make_filter_01_08.png" alt=""> <p>Frequency response (with frequency in Hz)</p><pre class="codeinput">plot(f*Fs, abs(H))
+title(<span class="string">'Frequency response'</span>)
+xlabel(<span class="string">'frequency (Hz)'</span>)
+grid
+</pre><img vspace="5" hspace="5" src="make_filter_01_09.png" alt=""> <pre class="codeinput">soundsc(h, Fs)
+</pre><p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+%% make_filter_01.m 
+%
+% Second-order recursive difference equation 
+% with prescribed poles.
+
+%%
+
+clc
+clear
+
+%% Difference equation
+% y(n) = b0 x(n) - a1 y(n-1) - a2 y(n-2)
+
+f1 = 0.2;           % normalized frequency (cycle/sample)
+om1 = 2*pi * f1;    % normalized frequency (radian/sample)
+r = 0.8;            % pole radius
+
+a1 = -2*r*cos(om1);
+a2 = r^2;
+   
+a = [1 a1 a2]       % recursive part (a0 = 1 in the difference equation)
+b = 1;              % non-recursive part (b0 = 1 in the difference equation)
+
+%% Impulse response
+% Calculate the impulse response using the Matlab function 'filter'.
+% Note that the amplitude envelope has the form r^n.
+
+N = 50;
+n = 0:N;
+
+imp = [1 zeros(1, N)];
+h = filter(b, a, imp);
+
+figure(1)
+clf
+plot(n, h, 'o-', n, r.^n, 'REPLACE_WITH_DASH_DASH')
+legend('Impulse response', 'Amplitude envelope')
+xlabel('Time (n)')
+title('Impulse response')
+
+
+%% Pole-zero plot
+% The poles are at z = r exp(om1 j) and z = r exp(-om1 j).
+% This is a complex conjugate pair.
+
+zplane(b, a)
+title('Pole-zero plot')
+print -dpdf figures/make_filter_01_zplane_1
+
+%% Frequency response
+% The frequency response has a peak at f1, as expected.
+% (Why is this expected?)
+
+[H, om] = freqz(b, a);
+f = om / (2*pi);
+plot(f, abs(H))
+title('Frequency response')
+xlabel('Normalized frequency (cycles/sample)')
+grid
+print -dpdf figures/make_filter_01_freqz_1
+
+%% When does response decay to 1%?
+% When does the impulse response decay down to 1% of its initial value?
+
+Na = log(0.01) / log(r)     % samples
+
+plot(n, h, n, r.^n, 'REPLACE_WITH_DASH_DASH', [Na Na], [-1 1], 'r')
+xlabel('Time (n)')
+title('Impulse response')
+
+%% Express in seconds (Ta)
+% If the filter operates at 8000 samples/second, then 
+% when does the impulse response decay down to 1% in seconds?
+
+Fs = 8000;   % samples/second
+
+Ta = Na / Fs    % seconds
+
+plot(n/Fs, h, n/Fs, r.^n, 'REPLACE_WITH_DASH_DASH', [Ta Ta], [-1 1], 'r')
+xlabel('Time (sec)')
+title('Impulse response')
+legend('Impulse response', 'Amplitude envelope')
+xlim([0 N/Fs])
+print -dpdf figures/make_filter_01_impresp_1
+
+%% Design system with specified Ta
+% Let us make a system that has Ta = 0.006 seconds.
+% What should the pole radius be?
+
+Ta = 0.006;
+Na = Ta * Fs;
+r = 0.01^(1/Na)
+
+%% Make the filter
+% difference equation 
+
+a = [1 -2*r*cos(om1) r^2]
+b = 1;
+
+%%
+% Pole-zero diagram
+
+zplane(b, a)
+title('Pole-zero plot')
+print -dpdf figures/make_filter_01_zplane_2
+
+%% 
+% Impulse response
+
+h = filter(b, a, imp);
+
+plot(n/Fs, h, n/Fs, r.^n, 'REPLACE_WITH_DASH_DASH', [Ta Ta], [-1 1], 'r')
+legend('Impulse response', 'Amplitude envelope')
+xlabel('Time (sec)')
+title('Impulse response')
+xlim([0 N/Fs])
+print -dpdf figures/make_filter_01_impresp_2
+
+%%
+% Frequency response
+% (How is this frequency response different than the first one?)
+
+[H, om] = freqz(b, a);
+f = om / (2*pi);
+plot(f, abs(H))
+title('Frequency response')
+xlabel('Normalized frequency')
+grid
+print -dpdf figures/make_filter_01_freqz_2
+
+%%
+% Frequency response (with frequency in Hz)
+
+plot(f*Fs, abs(H))
+title('Frequency response')
+xlabel('frequency (Hz)')
+grid
+
+%% 
+
+soundsc(h, Fs)
+
+
+##### SOURCE END #####
+--></body></html>
