@@ -1,0 +1,86 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1265\cocoasubrtf210
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww25160\viewh27100\viewkind1
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f0\b\fs24 \cf0 Wave file demos
+\b0 \
+\
+For python 'wave' library, see:\
+{\field{\*\fldinst{HYPERLINK "https://docs.python.org/2/library/wave.html"}}{\fldrslt https://docs.python.org/3/library/wave.html}}\
+\
+For python 'pack' library see:\
+{\field{\*\fldinst{HYPERLINK "https://docs.python.org/2/library/struct.html"}}{\fldrslt https://docs.python.org/3/library/struct.html}}\
+\
+\
+
+\b read_wavefile_01.m
+\b0 \
+\
+In Matlab, reads 'cat' wav file.\
+Play signal, plot signal, illustrate quantization, FFT and plot.\
+Illustrates fftshift, FFT zero-padding\
+\
+
+\b read_wavefile_02.py\
+read_wavefile_03.py\
+
+\b0 \
+Open a wav file in python and read information.\
+\
+
+\b write_sin_01.py\
+
+\b0 \
+How many bits per sample ?\
+How many bits per second ?\
+What if maxAmp is higher than the value used in the demo? Or lower?\
+For stereo, how many bits per second are there?\
+What if 'h' is a different code ?\
+What if there are more than two channels?\
+\
+
+\b read_sin_01.m\
+
+\b0 \
+Plot the spectrum of the sinusoid. The peak in the spectrum better match the frequency of the sinusoid!\
+\
+
+\b write_sin_02.py
+\b0 \
+\
+Use python to generate a wav file with more bits per sample.\
+Verify that the spectrum has a peak at the prescribed frequency.\
+Verify that that the number of bits per sample is the prescribed value.\
+\
+
+\b Activities for students (see assignment)
+\b0 \
+\
+Use Matlab to read in sin_02_mono.wav\
+- Verify quantization size, is it as expected?\
+Solution: read_sin_02.m\
+\
+Use Python to generate a WAV file of a sine wave at 8 bits per sample. (How do you do this?)\
+Solution: write_sin_03.py\
+\
+Read your 8 bit/sample wav file into matlab\
+- verify quantization is as expected, verify spectrum,\
+- Is there any audible affect of the lower number of bits/second?\
+Solution: read_sin_03.m\
+	\
+Use Python to create a wave file of a sinusoid with a lower frequency, like 50 Hz.\
+How low can the frequency be before you can not hear it?\
+Solution: write_sin_04.py\
+\
+Use python to create a wav file with more than two channels.  Read the wave file into Matlab and plot the individual channels.\
+Solution: write_sin_05.py, read_sin_05.m \
+	\
+In a stereo wave file, how are the two channels of a stereo audio signal stored?  \
+\
+Use Python to create a wave file of a sinusoid using a higher sampling rate, like 16K 32K or 441,000 samples/second.\
+\
+\
+\
+}

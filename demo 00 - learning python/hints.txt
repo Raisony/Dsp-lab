@@ -1,0 +1,45 @@
+
+
+Python notes
+
+---------- 
+
+In terminal on command line:
+
+python hello.py
+python3 hello.py
+
+---------- 
+
+which python
+which python3
+
+---------- 
+
+In terminal, type 'python' to open a python session.
+
+use help like this:
+
+>>> help(len)
+
+then use 'q' to exit the help and 'h' for help
+
+---------- 
+
+To exit python in terminal:
+exit() or Control-D
+
+---------- 
+
+To clear screen in Python shell
+CONTROL-L
+
+---------- 
+
+To shorten prompt in terminal:
+
+export PS1="term: "
+
+---------- 
+
+

@@ -1,0 +1,37 @@
+Differences between python 2 and python 3.
+
+---------- In Python 2 ---------------
+
+>>> 5/3
+1
+
+>>> print 'hello'
+hello
+
+>>> print('hello')
+hello
+
+
+---------- In Python 3 ---------------
+
+>>> 5/3
+1.6666666666666667
+
+>>> print 'hello'
+  File "<stdin>", line 1
+    print 'hello'
+                ^
+SyntaxError: Missing parentheses in call to 'print'. Did you mean print('hello')?
+
+>>> print('hello')
+hello
+
+
+------------------------
+
+In Python 3
+ / works as expected
+ the print command needs parentheses 
+
+We will use Python 3 in this course
+

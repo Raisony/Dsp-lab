@@ -1,0 +1,10 @@
+
+
+To view binary files on Windows using xxd
+
+First, download xxd.exe from http://ge.tt/5jfutZq/v/0
+Second, put xxd.exe under the same folder of file1, file2,....
+Finally, use same commands, such as
+.\xxd -b file1
+The attachment includes a demo png.
+

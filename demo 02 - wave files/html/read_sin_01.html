@@ -1,0 +1,367 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>read_sin_01.m</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-09-06"><meta name="DC.source" content="read_sin_01.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>read_sin_01.m</h1><!--introduction--><p>View parameters, plot waveform, compute and display spectrum. Verify that the frequency of the sinusoid (as measured using the FFT) is the expected frequency.</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#2">Load .wav file</a></li><li><a href="#5">Plot waveform</a></li><li><a href="#6">Time axis in seconds</a></li><li><a href="#7">Zoom in to 50 msec</a></li><li><a href="#8">What is the quantization increment ?</a></li><li><a href="#12">Frequency spectrum</a></li><li><a href="#13">Compute Fourier transform</a></li><li><a href="#14">Center dc</a></li><li><a href="#15">Normalized frequency</a></li><li><a href="#16">Frequency in Hz</a></li><li><a href="#18">Fourier transform in dB</a></li></ul></div><pre class="codeinput">clear
+</pre><h2>Load .wav file<a name="2"></a></h2><pre class="codeinput">[x, Fs, nbits, opts] = wavread(<span class="string">'sin_01_mono.wav'</span>);
+
+whos
+</pre><pre class="codeoutput">  Name          Size            Bytes  Class     Attributes
+
+  Fs            1x1                 8  double              
+  nbits         1x1                 8  double              
+  opts          1x1              1280  struct              
+  x          4000x1             32000  double              
+
+</pre><pre class="codeinput">Fs
+nbits
+opts.fmt
+</pre><pre class="codeoutput">
+Fs =
+
+        8000
+
+
+nbits =
+
+    16
+
+
+ans = 
+
+         wFormatTag: 1
+          nChannels: 1
+     nSamplesPerSec: 8000
+    nAvgBytesPerSec: 16000
+        nBlockAlign: 2
+     nBitsPerSample: 16
+
+</pre><pre class="codeinput">soundsc(x, Fs)
+</pre><h2>Plot waveform<a name="5"></a></h2><pre class="codeinput">figure(1)
+clf
+plot(x)
+xlabel(<span class="string">'Time (sample)'</span>)
+</pre><img vspace="5" hspace="5" src="read_sin_01_01.png" alt=""> <h2>Time axis in seconds<a name="6"></a></h2><pre class="codeinput">N = length(x);
+t = (1:N)/Fs;
+
+figure(1)
+clf
+plot(t, x)
+xlabel(<span class="string">'Time (sec)'</span>)
+</pre><img vspace="5" hspace="5" src="read_sin_01_02.png" alt=""> <h2>Zoom in to 50 msec<a name="7"></a></h2><pre class="codeinput">xlim(0.4 + [0 0.050])
+</pre><img vspace="5" hspace="5" src="read_sin_01_03.png" alt=""> <h2>What is the quantization increment ?<a name="8"></a></h2><pre class="codeinput">x(100:110)
+</pre><pre class="codeoutput">
+ans =
+
+    0.9969
+    0.9918
+    0.9450
+    0.8584
+    0.7357
+    0.5820
+    0.4038
+    0.2087
+    0.0048
+   -0.1993
+   -0.3951
+
+</pre><pre class="codeinput">x(100:110) * 2^14
+</pre><pre class="codeoutput">
+ans =
+
+   1.0e+04 *
+
+    1.6334
+    1.6250
+    1.5482
+    1.4063
+    1.2053
+    0.9535
+    0.6616
+    0.3419
+    0.0078
+   -0.3266
+   -0.6473
+
+</pre><pre class="codeinput">x(100:110) * 2^15
+</pre><pre class="codeoutput">
+ans =
+
+       32667
+       32500
+       30965
+       28127
+       24106
+       19070
+       13233
+        6838
+         156
+       -6532
+      -12946
+
+</pre><pre class="codeinput"><span class="comment">% Quantization size is 1 / 2^15</span>
+2^15
+</pre><pre class="codeoutput">
+ans =
+
+       32768
+
+</pre><h2>Frequency spectrum<a name="12"></a></h2><p>Use Fast Fourier Transform (FFT)</p><pre class="codeinput"><span class="comment">% Use power of 2 for FFT efficiency</span>
+N = length(x)
+Nfft = 2^ceil(2+log2(N))        <span class="comment">% Use FFT length longer than signal length</span>
+</pre><pre class="codeoutput">
+N =
+
+        4000
+
+
+Nfft =
+
+       16384
+
+</pre><h2>Compute Fourier transform<a name="13"></a></h2><pre class="codeinput">X = fft(x, Nfft);
+k = 0:Nfft-1;      <span class="comment">% FFT index</span>
+
+figure(1)
+clf
+plot(k, abs(X))
+xlabel(<span class="string">'FFT index'</span>)
+title(<span class="string">'Spectrum'</span>)
+</pre><img vspace="5" hspace="5" src="read_sin_01_04.png" alt=""> <h2>Center dc<a name="14"></a></h2><pre class="codeinput">X2 = fftshift(X);
+k2 = -Nfft/2 : Nfft/2-1;
+
+figure(1)
+clf
+plot(k2, abs(X2))
+xlabel(<span class="string">'FFT index'</span>)
+title(<span class="string">'Spectrum'</span>)
+</pre><img vspace="5" hspace="5" src="read_sin_01_05.png" alt=""> <h2>Normalized frequency<a name="15"></a></h2><p>Normalized frequency is in units of [cycles per sample]</p><pre class="codeinput">fn = ( -Nfft/2 : Nfft/2-1 ) / Nfft;
+
+figure(1)
+clf
+plot(fn, abs(X2))
+xlabel(<span class="string">'Frequency (cycles/sample)'</span>)
+title(<span class="string">'Spectrum'</span>)
+</pre><img vspace="5" hspace="5" src="read_sin_01_06.png" alt=""> <h2>Frequency in Hz<a name="16"></a></h2><pre class="codeinput">f = fn * Fs;
+
+figure(1)
+clf
+plot(f, abs(X2))
+xlabel(<span class="string">'Frequency (Hz)'</span>)
+title(<span class="string">'Spectrum'</span>)
+</pre><img vspace="5" hspace="5" src="read_sin_01_07.png" alt=""> <p>Zoom to frequency band [200 350] Hz. Notice the sidelobes</p><pre class="codeinput">xlim([200 350])
+</pre><img vspace="5" hspace="5" src="read_sin_01_08.png" alt=""> <h2>Fourier transform in dB<a name="18"></a></h2><pre class="codeinput">X_dB = 20*log10(abs(X2));
+
+figure(1)
+clf
+plot(f, X_dB)
+xlabel(<span class="string">'Frequency (Hz)'</span>)
+title(<span class="string">'Spectrum (dB)'</span>)
+
+xlim([0 Fs/2])
+grid
+
+print <span class="string">-dpdf</span> <span class="string">read_sin_01_spectrum</span>
+</pre><img vspace="5" hspace="5" src="read_sin_01_09.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+%% read_sin_01.m
+%
+% View parameters, plot waveform, compute and display spectrum.
+% Verify that the frequency of the sinusoid (as measured using the FFT)
+% is the expected frequency. 
+
+%%
+
+clear
+
+%% Load .wav file 
+
+[x, Fs, nbits, opts] = wavread('sin_01_mono.wav');
+
+whos
+
+%%
+
+Fs
+nbits
+opts.fmt
+
+%%
+
+soundsc(x, Fs)
+
+%% Plot waveform
+
+figure(1)
+clf
+plot(x)
+xlabel('Time (sample)')
+
+%% Time axis in seconds
+
+N = length(x);
+t = (1:N)/Fs;
+
+figure(1)
+clf
+plot(t, x)
+xlabel('Time (sec)')
+
+%% Zoom in to 50 msec
+
+xlim(0.4 + [0 0.050])
+
+%% What is the quantization increment ?
+
+x(100:110)
+
+%%
+
+x(100:110) * 2^14  
+
+%%
+
+x(100:110) * 2^15
+
+
+%%
+
+% Quantization size is 1 / 2^15
+2^15
+
+
+%% Frequency spectrum
+% Use Fast Fourier Transform (FFT)
+
+% Use power of 2 for FFT efficiency
+N = length(x)
+Nfft = 2^ceil(2+log2(N))        % Use FFT length longer than signal length
+
+%% Compute Fourier transform 
+
+X = fft(x, Nfft);   
+k = 0:Nfft-1;      % FFT index
+
+figure(1)
+clf
+plot(k, abs(X))
+xlabel('FFT index')
+title('Spectrum')
+
+%% Center dc
+
+X2 = fftshift(X);
+k2 = -Nfft/2 : Nfft/2-1;
+
+figure(1)
+clf
+plot(k2, abs(X2))
+xlabel('FFT index')
+title('Spectrum')
+
+%% Normalized frequency
+% Normalized frequency is in units of [cycles per sample]
+
+fn = ( -Nfft/2 : Nfft/2-1 ) / Nfft;
+
+figure(1)
+clf
+plot(fn, abs(X2))
+xlabel('Frequency (cycles/sample)')
+title('Spectrum')
+
+%% Frequency in Hz
+
+f = fn * Fs;
+
+figure(1)
+clf
+plot(f, abs(X2))
+xlabel('Frequency (Hz)')
+title('Spectrum')
+
+%%
+% Zoom to frequency band [200 350] Hz.
+% Notice the sidelobes
+
+xlim([200 350])
+
+
+%% Fourier transform in dB
+
+X_dB = 20*log10(abs(X2));
+
+figure(1)
+clf
+plot(f, X_dB)
+xlabel('Frequency (Hz)')
+title('Spectrum (dB)')
+
+xlim([0 Fs/2])
+grid
+
+print -dpdf read_sin_01_spectrum
+
+##### SOURCE END #####
+--></body></html>

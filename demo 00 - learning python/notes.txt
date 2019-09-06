@@ -1,0 +1,254 @@
+
+
+# numbers
+
+type(5)
+
+type(5.0)
+
+# powers
+
+2**8
+
+#  past value, '_' means the last printed expression
+
+5 + 11
+_
+
+5 + 11
+_ * 2
+
+
+# complex numbers
+
+a = 5 + 2j
+type(a)
+a + 1
+a - 5j
+a.real
+a.imag
+a.conjugate()
+a * a.conjugate()
+
+# Strings
+
+s = 'goodbye CAT'
+s[0]
+s[1]
+len(s)
+s.upper()
+s.lower()
+type(s)
+
+
+# SLICING - indexing starts with 0
+
+s[0:4]		# first four elements
+s[1:4]
+s[1:]		# removes first element
+s[:]		# all elements
+s[-1]      	# last element
+s[4:-1]		# removes first three elements and last element
+s[-3:]		# last three elements
+s[:-1]		# removes last elements
+s[:-2]      	# removes last two elements
+s[:4] + s[4:]	# complete string
+
+
+
+# STRINGS ARE IMMUTABLE
+
+# the elements of a string can not be changed
+
+s[2]
+
+s[2] = 'b'
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+TypeError: 'str' object does not support item assignment
+
+# CONCATENATION
+
+'abc' + 'xyz'
+s = 'abc'
+s + s
+2*s
+50*s
+
+# FUNCTIONS
+
+import my_functions
+
+# help(my_functions)
+
+# press 'q' to exit help screen
+
+dir(my_functions)
+
+my_functions.funA(3.2)
+
+my_functions.funB(3)
+
+
+# To import just one function:
+
+from my_functions import funA
+
+funA(3.2)
+
+
+# If a file has been edited, then reload it via:
+
+import importlib
+importlib.reload(my_functions)
+
+
+
+# Lists
+
+v = [10, 5, 1, 200, 'abc']
+type(v)
+v[0]
+v[1]
+v[-1]
+
+# SLICING
+
+v[0:3]
+v[1:]
+v[:-1]
+v[:]
+v[3:4]
+# compare with
+
+v[3]
+
+
+v = [10, 5, 1, 200, 'abc']
+# Compare:
+
+v[1] = []
+v
+v[2:3] = []
+v
+
+
+# LIST ARE MUTABLE, the values of a list can be changed
+
+v[1] = 9999
+v
+v.append(13)
+v
+v.reverse()
+v
+v.append('dog')
+v
+v.append('cat')
+v
+v[0]
+v[-1]
+
+# replace an element
+
+v[3:4] = ['hello']
+
+# LOOPS
+
+for i in v:
+   print(i)
+
+for i in v:
+   print(i, 2*i)
+
+for i in range(10):
+	print(i)
+
+for i in range(5, 10):
+	print(i)
+
+for i in range(0, 10, 2):
+	print(i)
+
+range(0, 10)    # iterable object 
+list(range(0, 10))    # convert to list
+
+
+# delete an element
+
+v = [10, 5, 1, 200, 'abc']
+del v[1]
+v
+
+
+# TUPLES, like a list, but immutable
+# Define a tuple using parentheses ( and )
+
+a = (10, 20, 'hello', 'bye')
+type(a)
+len(a)
+a[0]
+a[1]
+a[-2:]   # last two elements
+a[:2]    # first two elements
+a[1] = 12     # error because tuples are immutable
+b = a[2:]
+b
+len(b)
+type(b)
+b = a[2:3]
+b
+len(b)
+type(b)
+
+# b is a tuple of length 1.  The comma indicates that it is a tuple...
+# To create a tuple of length 1, use a comma:
+
+c = ('cat',)
+type(c)
+g = (10,)
+g
+type(g)
+
+# short-cut to create tuples: omit parentheses
+
+a = (10, 20, 'hello', 'bye')
+a
+a = 10, 20, 'hello', 'bye'
+a
+
+# create a tuple of one element without parenthesis
+
+f = 10,
+f
+type(f)
+len(f)
+
+# unpacking a sequence
+
+a = (10, 20)    # tuple
+x, y = a
+x
+y
+
+a = [10, 20]    # list
+x, y = a
+x
+y
+
+# Must have correct number of variables on left-hand-side
+
+a = [10, 20, 'hello']    # list
+x, y = a  		# ERROR 
+x, y, z = a	 	# it works
+
+
+# MATH
+
+import math
+dir(math)
+math.pi
+math.cos(math.pi)
+
+
+quit()
+

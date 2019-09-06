@@ -1,0 +1,381 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>read_wavefile_01.m</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2017-09-06"><meta name="DC.source" content="read_wavefile_01.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>read_wavefile_01.m</h1><!--introduction--><p>View parameters, plot waveform, compute and display spectrum</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Start</a></li><li><a href="#2">Load .wav file</a></li><li><a href="#5">Plot waveform</a></li><li><a href="#6">Time axis in seconds</a></li><li><a href="#7">Zoom in to 50 msec</a></li><li><a href="#8">Distribution of samples</a></li><li><a href="#9">See quantization</a></li><li><a href="#10">What is the quantization increment ?</a></li><li><a href="#13">Frequency spectrum</a></li><li><a href="#14">Compute Fourier transform</a></li><li><a href="#15">Center dc</a></li><li><a href="#16">Normalized frequency</a></li><li><a href="#17">Frequency in Hz</a></li></ul></div><h2>Start<a name="1"></a></h2><pre class="codeinput">clear
+
+help <span class="string">wavread</span>
+</pre><pre class="codeoutput"> WAVREAD Read Microsoft WAVE (".wav") sound file.
+    Y=WAVREAD(FILE) reads a WAVE file specified by the string FILE,
+    returning the sampled data in Y. The ".wav" extension is appended
+    if no extension is given.
+ 
+    [Y,FS,NBITS]=WAVREAD(FILE) returns the sample rate (FS) in Hertz
+    and the number of bits per sample (NBITS) used to encode the
+    data in the file.
+ 
+    [...]=WAVREAD(FILE,N) returns only the first N samples from each
+        channel in the file.
+    [...]=WAVREAD(FILE,[N1 N2]) returns only samples N1 through N2 from
+        each channel in the file.
+ 
+    [Y,...]=WAVREAD(...,FMT) specifies the data type format of Y used
+        to represent samples read from the file.
+        If FMT='double', Y contains double-precision normalized samples.
+        If FMT='native', Y contains samples in the native data type
+        found in the file.  Interpretation of FMT is case-insensitive,
+        and partial matching is supported.  If omitted, FMT='double'.
+ 
+    SIZ=WAVREAD(FILE,'size') returns the size of the audio data contained
+        in the file in place of the actual audio data, returning the
+        2-element vector SIZ=[samples channels].
+ 
+    [Y,FS,NBITS,OPTS]=WAVREAD(...) returns a structure OPTS of additional
+        information contained in the WAV file.  The content of this
+        structure differs from file to file.  Typical structure fields
+        include '.fmt' (audio format information) and '.info' (text
+        which may describe title, author, etc.)
+ 
+    Output Scaling
+    The range of values in Y depends on the data format FMT specified.
+    Some examples of output scaling based on typical bit-widths found
+    in a WAV file are given below for both 'double' and 'native' formats.
+    FMT='native'
+       #Bits   MATLAB data type          Data range
+       -----   ------------------------- -------------------
+         8     uint8  (unsigned integer)      0 &lt;= Y &lt;= 255
+        16     int16  (signed integer)   -32768 &lt;= Y &lt;= +32767
+        24     int32  (signed integer)    -2^23 &lt;= Y &lt;= 2^23-1
+        32     single (floating point)     -1.0 &lt;= Y &lt;= +1.0
+ 
+    FMT='double'
+       #Bits   MATLAB data type          Data range
+       -----   ------------------------- -------------------
+        N&lt;32   double                     -1.0 &lt;= Y &lt;  +1.0
+        N=32   double                     -1.0 &lt;= Y &lt;= +1.0
+       Note: Values in y might exceed -1.0 or +1.0 for the case of
+             N=32 bit data samples stored in the WAV file.
+ 
+    Supports multi-channel data, with up to 32 bits per sample.
+    Supports Microsoft PCM data format only.
+ 
+    See also WAVWRITE, AUREAD, AUWRITE.
+
+    Reference page in Help browser
+       doc wavread
+
+</pre><h2>Load .wav file<a name="2"></a></h2><pre class="codeinput">[x, Fs, nbits, opts] = wavread(<span class="string">'cat01.wav'</span>);
+
+whos
+</pre><pre class="codeoutput">  Name          Size            Bytes  Class     Attributes
+
+  Fs            1x1                 8  double              
+  nbits         1x1                 8  double              
+  opts          1x1              1280  struct              
+  x          6134x1             49072  double              
+
+</pre><pre class="codeinput">Fs
+nbits
+opts.fmt
+</pre><pre class="codeoutput">
+Fs =
+
+        8000
+
+
+nbits =
+
+    16
+
+
+ans = 
+
+         wFormatTag: 1
+          nChannels: 1
+     nSamplesPerSec: 8000
+    nAvgBytesPerSec: 16000
+        nBlockAlign: 2
+     nBitsPerSample: 16
+
+</pre><pre class="codeinput">soundsc(x, Fs)
+</pre><h2>Plot waveform<a name="5"></a></h2><pre class="codeinput">figure(1)
+clf
+plot(x)
+xlabel(<span class="string">'Time (sample)'</span>)
+title(<span class="string">'Signal'</span>)
+</pre><img vspace="5" hspace="5" src="read_wavefile_01_01.png" alt=""> <h2>Time axis in seconds<a name="6"></a></h2><pre class="codeinput">N = length(x);
+t = (1:N)/Fs;
+
+figure(1)
+clf
+plot(t, x)
+xlabel(<span class="string">'Time (sec)'</span>)
+title(<span class="string">'Signal'</span>)
+</pre><img vspace="5" hspace="5" src="read_wavefile_01_02.png" alt=""> <h2>Zoom in to 50 msec<a name="7"></a></h2><pre class="codeinput">xlim(0.4 + [0 0.050])
+</pre><img vspace="5" hspace="5" src="read_wavefile_01_03.png" alt=""> <h2>Distribution of samples<a name="8"></a></h2><pre class="codeinput">xs = sort(x);
+
+figure(1)
+clf
+plot(xs)
+title(<span class="string">'Sorted signal values'</span>)
+</pre><img vspace="5" hspace="5" src="read_wavefile_01_04.png" alt=""> <h2>See quantization<a name="9"></a></h2><pre class="codeinput">ylim([-0.0002 0.0002])
+grid
+</pre><img vspace="5" hspace="5" src="read_wavefile_01_05.png" alt=""> <h2>What is the quantization increment ?<a name="10"></a></h2><pre class="codeinput"><span class="comment">% smallest positive value (SPV)</span>
+
+SPV = min(x(x &gt; 0))
+</pre><pre class="codeoutput">
+SPV =
+
+   3.0518e-05
+
+</pre><pre class="codeinput"><span class="comment">% The smallest positive value is 1/2^15</span>
+1/SPV
+2^15
+</pre><pre class="codeoutput">
+ans =
+
+       32768
+
+
+ans =
+
+       32768
+
+</pre><p>All values x(n) are integer multiples of 1/2^15 Why?</p><h2>Frequency spectrum<a name="13"></a></h2><p>Use Fast Fourier Transform (FFT)</p><pre class="codeinput"><span class="comment">% Use power of 2 for FFT efficiency</span>
+N = length(x)
+Nfft = 2^ceil(log2(N))  <span class="comment">% smallest power of 2 greater than signal length</span>
+</pre><pre class="codeoutput">
+N =
+
+        6134
+
+
+Nfft =
+
+        8192
+
+</pre><h2>Compute Fourier transform<a name="14"></a></h2><pre class="codeinput">X = fft(x, Nfft);
+k = 0:Nfft-1;      <span class="comment">% FFT index</span>
+
+figure(1)
+clf
+plot(k, abs(X))
+xlabel(<span class="string">'FFT index'</span>)
+title(<span class="string">'Spectrum'</span>)
+</pre><img vspace="5" hspace="5" src="read_wavefile_01_06.png" alt=""> <h2>Center dc<a name="15"></a></h2><pre class="codeinput">X2 = fftshift(X);
+k2 = -Nfft/2 : Nfft/2-1;
+
+figure(1)
+clf
+plot(k2, abs(X2))
+xlabel(<span class="string">'FFT index'</span>)
+title(<span class="string">'Spectrum'</span>)
+</pre><img vspace="5" hspace="5" src="read_wavefile_01_07.png" alt=""> <h2>Normalized frequency<a name="16"></a></h2><p>Normalized frequency is in units of [cycles per sample]</p><pre class="codeinput">fn = ( -Nfft/2 : Nfft/2-1 ) / Nfft;
+
+figure(1)
+clf
+plot(fn, abs(X2))
+xlabel(<span class="string">'Frequency (cycles/sample)'</span>)
+title(<span class="string">'Spectrum'</span>)
+</pre><img vspace="5" hspace="5" src="read_wavefile_01_08.png" alt=""> <h2>Frequency in Hz<a name="17"></a></h2><pre class="codeinput">f = fn * Fs;
+
+figure(1)
+clf
+plot(f, abs(X2))
+xlabel(<span class="string">'Frequency (cycles/second, i.e. Hz)'</span>)
+title(<span class="string">'Spectrum'</span>)
+</pre><img vspace="5" hspace="5" src="read_wavefile_01_09.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+%% read_wavefile_01.m
+% View parameters, plot waveform, compute and display spectrum
+
+%% Start
+
+clear
+
+help wavread
+
+%% Load .wav file 
+
+[x, Fs, nbits, opts] = wavread('cat01.wav');
+
+whos
+
+%%
+
+Fs
+nbits
+opts.fmt
+
+%%
+
+soundsc(x, Fs)
+
+%% Plot waveform
+
+figure(1)
+clf
+plot(x)
+xlabel('Time (sample)')
+title('Signal')
+
+%% Time axis in seconds
+
+N = length(x);
+t = (1:N)/Fs;
+
+figure(1)
+clf
+plot(t, x)
+xlabel('Time (sec)')
+title('Signal')
+
+%% Zoom in to 50 msec
+
+xlim(0.4 + [0 0.050])
+
+%% Distribution of samples
+
+xs = sort(x);
+
+figure(1)
+clf
+plot(xs)
+title('Sorted signal values')
+
+%% See quantization
+
+ylim([-0.0002 0.0002])
+grid
+
+%% What is the quantization increment ?
+
+% smallest positive value (SPV)
+
+SPV = min(x(x > 0))
+
+%%
+
+% The smallest positive value is 1/2^15
+1/SPV
+2^15
+
+%%
+% All values x(n) are integer multiples of 1/2^15
+% Why?
+
+%% Frequency spectrum
+% Use Fast Fourier Transform (FFT)
+
+% Use power of 2 for FFT efficiency
+N = length(x)
+Nfft = 2^ceil(log2(N))  % smallest power of 2 greater than signal length
+
+%% Compute Fourier transform 
+
+X = fft(x, Nfft);   
+k = 0:Nfft-1;      % FFT index
+
+figure(1)
+clf
+plot(k, abs(X))
+xlabel('FFT index')
+title('Spectrum')
+
+%% Center dc
+
+X2 = fftshift(X);
+k2 = -Nfft/2 : Nfft/2-1;
+
+figure(1)
+clf
+plot(k2, abs(X2))
+xlabel('FFT index')
+title('Spectrum')
+
+%% Normalized frequency
+% Normalized frequency is in units of [cycles per sample]
+
+fn = ( -Nfft/2 : Nfft/2-1 ) / Nfft;
+
+figure(1)
+clf
+plot(fn, abs(X2))
+xlabel('Frequency (cycles/sample)')
+title('Spectrum')
+
+%% Frequency in Hz
+
+f = fn * Fs;
+
+figure(1)
+clf
+plot(f, abs(X2))
+xlabel('Frequency (cycles/second, i.e. Hz)')
+title('Spectrum')
+
+
+
+##### SOURCE END #####
+--></body></html>
