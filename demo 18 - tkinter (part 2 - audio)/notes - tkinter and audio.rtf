@@ -1,0 +1,71 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1265\cocoasubrtf210
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww25160\viewh27100\viewkind1
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\qc
+
+\f0\b\fs24 \cf0 Tkinter and Pyaudio
+\b0 \
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\cf0 \
+These demos combine Tkinter and Pyaudio. The audio is adjusted via Tkinter through buttons, sliders, and the keyboard. \
+\
+In all these demos we use top.update() instead of top.mainloop(). We do not need a Tkinter loop, because there is already a loop for audio.\
+\
+Tk_demo_00_update\
+   The .update function in Tkinter (alternative to .mainloop).\
+\
+Tk_demo_01_buttons.py\
+   Use buttons to adjust the frequency of a sinusoid.\
+\
+Tk_demo_02_slider.py\
+   Use a slider to adjust the frequency of a sinusoid.\
+\
+Tk_demo_03_slider.py\
+   Use two sliders to adjust the frequency and gain of a sinusoid.\
+\
+Tk_demo_04_keyboard.py\
+   Read characters from the keyboard\
+\
+Tk_demo_05_keyboard.py\
+   Use the keyboard to adjust the frequency of a sinusoid.\
+\
+Tk_demo_06_keyboard.py\
+   Use the keyboard to adjust the frequency of a sinusoid and display frequency.\
+\
+Tk_demo_07_keyboard.py\
+   Use the keyboard to adjust both the frequency and gain of a sinusoid.\
+\
+Tk_demo_08_keyboard.py\
+   Play a note (via difference equation) upon keypress.\
+\
+
+\b Exercises
+\b0 \
+\
+1) In the demo program 
+\i Tk_demo_03_slider.py
+\i0 , whenever the gain slider is adjusted, a click sound can be heard, due to the discontinuity in signal waveform due to a sudden change in amplitude. Modify this program so there is no click (no signal discontinuity).\
+2) Make real-time echo effect with slider to control delay time. Use circular buffer.\
+2) Make real-time vibrato effect with sliders to control parameters (LFO, depth)\
+3) Make real-time AM effect with sliders to control parameters (modulation frequency, gain)\
+\
+
+\b Create a stand-alone application\
+
+\b0 \
+A Python program can be converted into a stand-alone application using pyinstaller.\
+\
+http://www.pyinstaller.org/\
+\
+One way to install pyinstaller is to type one of the following in the terminal:\
+\
+pip install pyinstaller\
+pip3 install pyinstaller\
+\
+To create a stand-alone application, type one of the following in the terminal window:\
+\
+pyinstaller python_file.py\
+pyinstaller --onefile python_file.py\
+pyinstaller --onefile --windowed python_file.py\
+}
