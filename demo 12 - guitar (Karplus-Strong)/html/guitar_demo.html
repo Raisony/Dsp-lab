@@ -1,0 +1,192 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>guitar_demo.m</title><meta name="generator" content="MATLAB 8.5"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-10-01"><meta name="DC.source" content="guitar_demo.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1>guitar_demo.m</h1><!--introduction--><p>Synthesize the sound of a plucked string using the Karplus-Strong method</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Define filter</a></li><li><a href="#2">Define input signal</a></li><li><a href="#3">Computer output of filter</a></li><li><a href="#4">Display output signal</a></li><li><a href="#5">Frequency response of filter</a></li></ul></div><h2>Define filter<a name="1"></a></h2><pre class="codeinput"><span class="comment">% Sampling frequency</span>
+Fs = 8000;
+
+<span class="comment">% Karplus-Strong paramters</span>
+K = 0.99;
+N = 60;
+
+a = [1 zeros(1, N-1) -K/2 -K/2];
+b = 1;
+</pre><h2>Define input signal<a name="2"></a></h2><pre class="codeinput"><span class="comment">% time duration (seconds)</span>
+T = 2.0;
+
+<span class="comment">% input signal</span>
+x = [randn(1, N) zeros(1, round(T*Fs))];
+</pre><h2>Computer output of filter<a name="3"></a></h2><pre class="codeinput"><span class="comment">% output signal</span>
+y = filter(b, a, x);
+</pre><h2>Display output signal<a name="4"></a></h2><pre class="codeinput">t = (1:numel(y))/Fs;
+
+figure(1)
+clf
+subplot(2, 1, 1)
+plot(t, y)
+xlabel(<span class="string">'Time (seconds)'</span>)
+title(<span class="string">'Simulated guitar waveform'</span>)
+xlim([0 t(end)])
+
+subplot(2, 1, 2)
+plot(t, y)
+xlabel(<span class="string">'Time (seconds)'</span>)
+title(<span class="string">'Simulated guitar waveform [Magnified view]'</span>)
+xlim([0.2 0.3])
+
+print <span class="string">-dpdf</span> <span class="string">figure_01</span>
+
+sound(y, Fs)
+</pre><img vspace="5" hspace="5" src="guitar_demo_01.png" alt=""> <h2>Frequency response of filter<a name="5"></a></h2><pre class="codeinput">[H, om] = freqz(b, a, 2^16);
+
+f = om/pi * Fs/2;
+
+figure(2)
+clf
+plot(f, abs(H))
+xlabel(<span class="string">'Frequency (Hz)'</span>)
+title(<span class="string">'Frequency response of Karplus-Strong system'</span>)
+
+print <span class="string">-dpdf</span> <span class="string">figure_02</span>
+
+<span class="comment">% first peak in frequency response:</span>
+Fs/(N+0.5)
+</pre><pre class="codeoutput">ans =
+  132.2314
+</pre><img vspace="5" hspace="5" src="guitar_demo_02.png" alt=""> <p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2015a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+%% guitar_demo.m
+% Synthesize the sound of a plucked string 
+% using the Karplus-Strong method
+
+%% Define filter
+
+% Sampling frequency
+Fs = 8000;
+
+% Karplus-Strong paramters
+K = 0.99;
+N = 60;
+
+a = [1 zeros(1, N-1) -K/2 -K/2];
+b = 1;
+
+%% Define input signal
+
+% time duration (seconds)
+T = 2.0;
+
+% input signal
+x = [randn(1, N) zeros(1, round(T*Fs))];
+
+%% Computer output of filter
+
+% output signal
+y = filter(b, a, x);
+
+%% Display output signal
+
+t = (1:numel(y))/Fs;
+
+figure(1)
+clf
+subplot(2, 1, 1)
+plot(t, y)
+xlabel('Time (seconds)')
+title('Simulated guitar waveform')
+xlim([0 t(end)])
+
+subplot(2, 1, 2)
+plot(t, y)
+xlabel('Time (seconds)')
+title('Simulated guitar waveform [Magnified view]')
+xlim([0.2 0.3])
+
+print -dpdf figure_01
+
+sound(y, Fs)
+
+%% Frequency response of filter
+
+[H, om] = freqz(b, a, 2^16);
+
+f = om/pi * Fs/2;
+
+figure(2)
+clf
+plot(f, abs(H))
+xlabel('Frequency (Hz)')
+title('Frequency response of Karplus-Strong system')
+
+print -dpdf figure_02
+
+% first peak in frequency response:
+Fs/(N+0.5)
+
+
+##### SOURCE END #####
+--></body></html>

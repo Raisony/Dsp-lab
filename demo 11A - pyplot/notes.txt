@@ -1,0 +1,41 @@
+
+
+https://matplotlib.org/
+
+https://matplotlib.org/tutorials/introductory/pyplot.html
+
+https://matplotlib.org/api/pyplot_summary.html
+
+
+pyplot_demo_01.py
+ - one plot
+pyplot_demo_02.py
+ - two plots in one axis
+
+pyplot_demo_03.py
+ - specify line style, line width, markers
+ - specify axis limits
+
+pyplot_demo_04.py
+ - save figure as pdf file
+
+pyplot_demo_05.py
+pyplot_demo_06.py
+ - list returned by pyplot.plot
+ - set line parameters after initial plot command
+ - set_color() etc.
+
+pyplot_demo_07.py
+ - define labels after initial plot command
+ - create legend
+
+pyplot_demo_08.py
+ - set line parameters using pyplot.setp()
+
+pyplot_demo_09.py
+ - set data after initial plot command
+
+pyplot_demo_10.py
+ - set 
+
+

@@ -1,0 +1,31 @@
+
+demo 09 - circular buffer (long buffer)
+
+Note: The two program produce the same output:
+
+  echo_via_circular_buffer.py
+  echo_via_circular_buffer_long.py
+But one program uses a longer buffer than necessary.
+In that program, two buffer indices are needed: 
+one index for reading from the buffer, 
+another index for writing to the buffer.
+
+A long buffer in useful when we need to change
+the delay during its operation.
+For example, the vibrato effect requires a
+time-varying delay. So, to implement the 
+vibrato effect, we need a buffer that is
+longer than necessary.
+
+
+
+
+
+
+
+
+
+
+
+
+
