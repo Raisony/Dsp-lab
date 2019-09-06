@@ -1,0 +1,352 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>block_filter_demo</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-10-06"><meta name="DC.source" content="block_filter_demo.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><h1>block_filter_demo</h1><!--introduction--><p>Illustrate block filtering in Matlab. It is necessary to set the initial conditions!</p><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#1">Using the function 'filter'</a></li><li><a href="#3">Block filtering</a></li><li><a href="#4">Compare</a></li><li><a href="#5">initial conditions (and final conditions)</a></li><li><a href="#6">Block filtering (corrected)</a></li><li><a href="#7">Zero-input</a></li></ul></div><h2>Using the function 'filter'<a name="1"></a></h2><pre class="codeinput">[sig, Fs] = wavread(<span class="string">'author.wav'</span>);
+
+N = 300;
+n = 1:N;
+
+<span class="comment">% define a signal</span>
+x = sig(1693 + n);
+
+<span class="comment">% make a band-pass filter</span>
+[b, a] = butter(2, [500 1000]*2/Fs);
+
+<span class="comment">% filter signal x to get output signal y1</span>
+y1 = filter(b, a, x);
+</pre><pre class="codeinput">figure(1)
+clf
+subplot(2, 1, 1)
+plot(n, x)
+ylim([-1 1])
+title(<span class="string">'Input signal'</span>)
+
+subplot(2, 1, 2)
+plot(n, y1)
+ylim([-1 1])
+title(<span class="string">'Output signal'</span>)
+
+print <span class="string">-dpdf</span> <span class="string">fig1</span>
+</pre><img vspace="5" hspace="5" src="block_filter_demo_01.png" alt=""> <h2>Block filtering<a name="3"></a></h2><p>Filter each block (of length 100) individually. Does it give the same result as y1?</p><pre class="codeinput">y2 = zeros(size(x));  <span class="comment">% initialize output signal</span>
+
+y2(  1:100) = filter(b, a, x(  1:100));
+y2(101:200) = filter(b, a, x(101:200));
+y2(201:300) = filter(b, a, x(201:300));
+
+figure(1)
+clf
+subplot(2, 1, 1)
+plot(n, x)
+title(<span class="string">'Input signal'</span>)
+ylim([-1 1])
+
+subplot(2, 1, 2)
+plot(n, y2)
+title(<span class="string">'Output signal (block-wise filter)'</span>)
+ylim([-1 1])
+
+print <span class="string">-dpdf</span> <span class="string">fig2</span>
+</pre><img vspace="5" hspace="5" src="block_filter_demo_02.png" alt=""> <h2>Compare<a name="4"></a></h2><p>The result y2 is not the same as y1. With each block, y1 starts at zero. That is because 'filter' assumes the initial conditions are zero.</p><p>It can be seen that using the wrong initial conditions results in a transient error signal.</p><pre class="codeinput">figure(1)
+clf
+subplot(2, 1, 1)
+plot(n, y1, n, y2)
+legend(<span class="string">'y1'</span>, <span class="string">'y2'</span>)
+ylim([-1 1])
+
+subplot(2, 1, 2)
+plot(n, y1 - y2)
+title(<span class="string">'y1 - y2'</span>)
+ylim([-1 1])
+
+print <span class="string">-dpdf</span> <span class="string">fig3</span>
+</pre><img vspace="5" hspace="5" src="block_filter_demo_03.png" alt=""> <h2>initial conditions (and final conditions)<a name="5"></a></h2><p>Can we set the initial conditions to be non-zero in the 'filter' function?  If so, what shall we set them to? Note Zf and Zi in the documentation for 'filter'. We can set the initial conditions (Zi). We can also get the final conditions (Zf).</p><pre class="codeinput">help <span class="string">filter</span>
+</pre><pre class="codeoutput"> FILTER One-dimensional digital filter.
+    Y = FILTER(B,A,X) filters the data in vector X with the
+    filter described by vectors A and B to create the filtered
+    data Y.  The filter is a "Direct Form II Transposed"
+    implementation of the standard difference equation:
+ 
+    a(1)*y(n) = b(1)*x(n) + b(2)*x(n-1) + ... + b(nb+1)*x(n-nb)
+                          - a(2)*y(n-1) - ... - a(na+1)*y(n-na)
+ 
+    If a(1) is not equal to 1, FILTER normalizes the filter
+    coefficients by a(1). 
+ 
+    FILTER always operates along the first non-singleton dimension,
+    namely dimension 1 for column vectors and non-trivial matrices,
+    and dimension 2 for row vectors.
+ 
+    [Y,Zf] = FILTER(B,A,X,Zi) gives access to initial and final
+    conditions, Zi and Zf, of the delays.  Zi is a vector of length
+    MAX(LENGTH(A),LENGTH(B))-1, or an array with the leading dimension 
+    of size MAX(LENGTH(A),LENGTH(B))-1 and with remaining dimensions 
+    matching those of X.
+ 
+    FILTER(B,A,X,[],DIM) or FILTER(B,A,X,Zi,DIM) operates along the
+    dimension DIM.
+ 
+    See also FILTER2, FILTFILT, FILTIC.
+ 
+    Note: FILTFILT and FILTIC are in the Signal Processing Toolbox.
+
+    Overloaded methods:
+       timeseries/filter
+       SigLogSelector.filter
+       gf/filter
+       channel.filter
+       mfilt.filter
+       adaptfilt.filter
+       LagOp/filter
+       fints/filter
+       fxptui.filter
+       dfilt.filter
+
+    Reference page in Help browser
+       doc filter
+
+</pre><h2>Block filtering (corrected)<a name="6"></a></h2><p>Set the initial conditions for each block as the final conditions for the previous block.</p><pre class="codeinput">y3 = zeros(size(x));  <span class="comment">% initialize output signal</span>
+
+[y3(  1:100), states] = filter(b, a, x(  1:100));
+[y3(101:200), states] = filter(b, a, x(101:200), states);
+[y3(201:300), states] = filter(b, a, x(201:300), states);
+
+figure(1)
+clf
+subplot(2, 1, 1)
+plot(n, x)
+title(<span class="string">'Input signal'</span>)
+ylim([-1 1])
+
+subplot(2, 1, 2)
+plot(n, y3)
+title(<span class="string">'Output signal (block-wise filter, corrected)'</span>)
+ylim([-1 1])
+
+print <span class="string">-dpdf</span> <span class="string">fig4</span>
+</pre><img vspace="5" hspace="5" src="block_filter_demo_04.png" alt=""> <h2>Zero-input<a name="7"></a></h2><p>Note that when the initial conditions are non-zero, then the output of the filter will be non-zero even if the input signal is zero!</p><pre class="codeinput">states = randn(4,1)
+</pre><pre class="codeoutput">
+states =
+
+    0.3188
+   -1.3077
+   -0.4336
+    0.3426
+
+</pre><pre class="codeinput">y_init_zero    = filter(b, a, zeros(1, 100) );
+y_init_nonzero = filter(b, a, zeros(1, 100), states);
+
+figure(1)
+clf
+subplot(2, 1, 1)
+plot(y_init_zero)
+title(<span class="string">'Output signal when input is zero and initial conditions are zero'</span>)
+
+subplot(2, 1, 2)
+plot(y_init_nonzero)
+title(<span class="string">'Output signal when input is zero and initial conditions are non-zero'</span>)
+</pre><img vspace="5" hspace="5" src="block_filter_demo_05.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+%% block_filter_demo
+% Illustrate block filtering in Matlab.
+% It is necessary to set the initial conditions!
+
+%% Using the function 'filter'
+
+[sig, Fs] = wavread('author.wav');
+
+N = 300;
+n = 1:N;
+
+% define a signal
+x = sig(1693 + n);
+
+% make a band-pass filter
+[b, a] = butter(2, [500 1000]*2/Fs);
+
+% filter signal x to get output signal y1
+y1 = filter(b, a, x);   
+
+%%
+
+figure(1)
+clf
+subplot(2, 1, 1)
+plot(n, x)
+ylim([-1 1])
+title('Input signal')
+
+subplot(2, 1, 2)
+plot(n, y1)
+ylim([-1 1])
+title('Output signal')
+
+print -dpdf fig1
+
+%% Block filtering
+% Filter each block (of length 100) individually.
+% Does it give the same result as y1? 
+
+y2 = zeros(size(x));  % initialize output signal
+
+y2(  1:100) = filter(b, a, x(  1:100));
+y2(101:200) = filter(b, a, x(101:200));
+y2(201:300) = filter(b, a, x(201:300));
+
+figure(1)
+clf
+subplot(2, 1, 1)
+plot(n, x)
+title('Input signal')
+ylim([-1 1])
+
+subplot(2, 1, 2)
+plot(n, y2)
+title('Output signal (block-wise filter)')
+ylim([-1 1])
+
+print -dpdf fig2
+
+%% Compare
+% The result y2 is not the same as y1. 
+% With each block, y1 starts at zero.
+% That is because 'filter' assumes the initial conditions are zero.
+%
+% It can be seen that using the wrong initial conditions
+% results in a transient error signal.
+
+figure(1)
+clf
+subplot(2, 1, 1)
+plot(n, y1, n, y2)
+legend('y1', 'y2')
+ylim([-1 1])
+
+subplot(2, 1, 2)
+plot(n, y1 - y2)
+title('y1 - y2')
+ylim([-1 1])
+
+print -dpdf fig3
+
+%% initial conditions (and final conditions)
+% Can we set the initial conditions to be non-zero in the 'filter'
+% function?  If so, what shall we set them to?
+% Note Zf and Zi in the documentation for 'filter'. 
+% We can set the initial conditions (Zi). We can also 
+% get the final conditions (Zf).
+
+help filter
+
+%% Block filtering (corrected)
+% Set the initial conditions for each block as
+% the final conditions for the previous block.
+
+y3 = zeros(size(x));  % initialize output signal
+
+[y3(  1:100), states] = filter(b, a, x(  1:100));
+[y3(101:200), states] = filter(b, a, x(101:200), states);
+[y3(201:300), states] = filter(b, a, x(201:300), states);
+
+figure(1)
+clf
+subplot(2, 1, 1)
+plot(n, x)
+title('Input signal')
+ylim([-1 1])
+
+subplot(2, 1, 2)
+plot(n, y3)
+title('Output signal (block-wise filter, corrected)')
+ylim([-1 1])
+
+print -dpdf fig4
+
+%% Zero-input
+% Note that when the initial conditions are non-zero, 
+% then the output of the filter will be non-zero
+% even if the input signal is zero!
+
+states = randn(4,1)
+
+%%
+
+y_init_zero    = filter(b, a, zeros(1, 100) );
+y_init_nonzero = filter(b, a, zeros(1, 100), states);
+
+figure(1)
+clf
+subplot(2, 1, 1)
+plot(y_init_zero)
+title('Output signal when input is zero and initial conditions are zero')
+
+subplot(2, 1, 2)
+plot(y_init_nonzero)
+title('Output signal when input is zero and initial conditions are non-zero')
+
+
+
+
+##### SOURCE END #####
+--></body></html>

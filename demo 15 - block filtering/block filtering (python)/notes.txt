@@ -1,0 +1,10 @@
+
+Matlab demo
+
+Initialization of states...
+
+In Python, in the library 'numpy', the command 'lfilter' works like 'filter' in Matlab.
+
+demo_filter.py
+demo_filter_blocking.py
+demo_filter_blocking_corrected.py

@@ -1,0 +1,124 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>compare_signals</title><meta name="generator" content="MATLAB 7.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2018-10-06"><meta name="DC.source" content="compare_signals.m"><style type="text/css">
+
+body {
+  background-color: white;
+  margin:10px;
+}
+
+h1 {
+  color: #990000; 
+  font-size: x-large;
+}
+
+h2 {
+  color: #990000;
+  font-size: medium;
+}
+
+/* Make the text shrink to fit narrow windows, but not stretch too far in 
+wide windows. */ 
+p,h1,h2,div.content div {
+  max-width: 600px;
+  /* Hack for IE6 */
+  width: auto !important; width: 600px;
+}
+
+pre.codeinput {
+  background: #EEEEEE;
+  padding: 10px;
+}
+@media print {
+  pre.codeinput {word-wrap:break-word; width:100%;}
+} 
+
+span.keyword {color: #0000FF}
+span.comment {color: #228B22}
+span.string {color: #A020F0}
+span.untermstring {color: #B20000}
+span.syscmd {color: #B28C00}
+
+pre.codeoutput {
+  color: #666666;
+  padding: 10px;
+}
+
+pre.error {
+  color: red;
+}
+
+p.footer {
+  text-align: right;
+  font-size: xx-small;
+  font-weight: lighter;
+  font-style: italic;
+  color: gray;
+}
+
+  </style></head><body><div class="content"><pre class="codeinput">[x1, Fs] = wavread(<span class="string">'author.wav'</span>);
+
+[x2, Fs] = wavread(<span class="string">'author_output.wav'</span>);
+
+[x3, Fs] = wavread(<span class="string">'author_output_blocking.wav'</span>);
+
+N = length(x1);
+n = 0:N-1;
+t = n/Fs;
+</pre><pre class="codeinput">N3 = length(x3);
+OFFSET = 0.3;
+
+figure(1)
+clf
+<span class="comment">% plot(t, x1, t, x2 - 0.5, t(1:N3), x3 - 1.0, 'k')</span>
+plot(t, x2+OFFSET, <span class="string">'b'</span>, t(1:N3), x3, <span class="string">'r'</span>, [0 t(end)], [0 0], <span class="string">'k:'</span>, [0 t(end)], [0 0]+OFFSET, <span class="string">'k:'</span>)
+legend(<span class="string">'Correct'</span>, <span class="string">'Incorrect'</span>)
+xlabel(<span class="string">'Time (sec)'</span>)
+</pre><img vspace="5" hspace="5" src="compare_signals_01.png" alt=""> <pre class="codeinput">xlim([0.32 0.35])
+ylim([-0.3 0.6])
+
+orient <span class="string">landscape</span>
+print <span class="string">-dpdf</span> <span class="string">compare_signals</span>
+</pre><img vspace="5" hspace="5" src="compare_signals_02.png" alt=""> <p class="footer"><br>
+      Published with MATLAB&reg; 7.12<br></p></div><!--
+##### SOURCE BEGIN #####
+
+[x1, Fs] = wavread('author.wav');
+
+[x2, Fs] = wavread('author_output.wav');
+
+[x3, Fs] = wavread('author_output_blocking.wav');
+
+N = length(x1);
+n = 0:N-1;
+t = n/Fs;
+
+%%
+
+N3 = length(x3);
+OFFSET = 0.3;
+
+figure(1)
+clf
+% plot(t, x1, t, x2 - 0.5, t(1:N3), x3 - 1.0, 'k')
+plot(t, x2+OFFSET, 'b', t(1:N3), x3, 'r', [0 t(end)], [0 0], 'k:', [0 t(end)], [0 0]+OFFSET, 'k:')
+legend('Correct', 'Incorrect')
+xlabel('Time (sec)')
+
+%%
+
+xlim([0.32 0.35])
+ylim([-0.3 0.6])
+
+orient landscape
+print -dpdf compare_signals
+
+
+##### SOURCE END #####
+--></body></html>

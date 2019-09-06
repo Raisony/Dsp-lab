@@ -1,0 +1,15 @@
+
+Documentation for NumPy:
+
+http://www.numpy.org/
+
+https://docs.scipy.org/doc/numpy/reference/
+
+https://docs.scipy.org/doc/numpy-dev/user/quickstart.html
+
+Documentation for the FFT in NumPy:
+
+http://docs.scipy.org/doc/numpy/reference/routines.fft.html
+
+
+

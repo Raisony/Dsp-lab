@@ -1,0 +1,44 @@
+Keypress Notes
+
+Demos:
+
+waitkey_demo_01.py
+  This demo waits for key press, then prints key value.  cv2 functions: odd, imread, imshow, waitKeywaitkey_demo_02.py
+  This demo uses a loop to read multiple key presses.waitkey_demo_03.py  This demo also uses loop to read multiple key presses.
+  In this demo the loop runs keeps running whether or not
+  the user pressed a key.key_play.py
+  This demo plays a sounds whenever the user presses a key.
+  The waitKey command is used to detect when the user presses a key. 
+
+cv2 is a Python library for computer vision using OpenCV. 
+
+In these demos, we use cv2 for the purpose of its 'waitKey' command. cv2 can detect when a key on the keyboard is pressed using the function cv2.waitKey.  To use this function, an image should first be displayed on the screen.  The waitKey function waits for a specified amount of time for a key to be pressed.  waitKey(10) will wait for up to 10 milliseconds. If no key is pressed during that time, then waitKey returns a value of -1.  If a key is pressed, then waitKey returns a corresponding key number.  waitKey(0) will wait forever for a key to be pressed.
+
+http://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_gui/py_image_display/py_image_display.html
+
+To installing cv2:
+
+pip3 install opencv-python
+or
+pip install opencv-python
+or
+sudo pip3 install opencv-python
+or
+sudo pip install opencv-python
+
+
+---
+
+Another way to install cv2 is using Anaconda. Conda is a package manager, which allows for easy and quick installation of a lot of python libraries.
+
+To download and install Anaconda:
+https://conda.io/docs/download.html
+https://conda.io/docs/install/full.html
+
+To install Opencv with Anaconda, run the following command on the terminal:
+
+conda install -c conda-forge opencv=3.2.0
+
+or (if the above does not work)
+
+conda install -c menpo opencv3=3.2.0
