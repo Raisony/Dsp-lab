@@ -1,0 +1,32 @@
+
+
+Demo programs for circular buffer.
+
+
+echo_via_append.py - a simple way to implement a delay
+
+echo_via_circular_buffer.py
+ - a better way to implement a delay
+
+
+In the append approach, we manipulate the buffer this way:
+
+
+>>> buffer = [ 0 for i in range(5) ]
+>>> buffer
+[0, 0, 0, 0, 0]
+
+>>> buffer.append(8)
+>>> buffer
+[0, 0, 0, 0, 0, 8]
+
+>>> buffer[0:1] = []
+>>> buffer
+[0, 0, 0, 0, 8]
+
+>>> buffer.append(5)
+>>> buffer[0:1] = []
+>>> buffer
+[0, 0, 0, 8, 5]
+
+

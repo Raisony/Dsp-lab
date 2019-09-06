@@ -1,0 +1,6 @@
+
+- ?
+
+wave_filter_python.py
+(review/reminder from last time)mic_filter.py
+mic_filter_FPB.py- FPB means 'frames per buffer'device_info.py

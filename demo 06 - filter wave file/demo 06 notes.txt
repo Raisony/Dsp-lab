@@ -1,0 +1,30 @@
+Read a wave (WAV) file into Python, then filter it and play it to the speaker using PyAudio.
+
+1) Matlab program:
+
+	wave_filter_matlab.m
+
+This program:
+  - loads a wave file (speech signal)
+  - makes a bandpass filter
+  - applies the bandpass filter to the speech signal
+  - writes the output signal to a wave file (output_matlab.wav)
+  - plays the wave file
+
+2) In Python:
+
+	wave_filter_python.py
+
+This program loads the same wave file and applies the same
+filter as in the matlab program.
+
+
+Activities:
+
+Modify the Python program so it writes the output signal to a wave file. Then verify the wave file is the same as the wave file produced by Matlab (e.g., read both wave files into Matlab and plot the error between them).
+
+Modify the python program so it plays a stereo signal: In the left channel, play the original signal. In the right channel, play the output signal.
+
+
+
+	
