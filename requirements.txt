@@ -1,10 +1,10 @@
-math
 wave
 scipy
+numpy
 struct
 librosa
-numpy
-tkinter
 pyaudio
+tkinter
 matplotlib
+mathematics
 python-opencv
